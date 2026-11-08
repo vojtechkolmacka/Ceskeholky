@@ -46,7 +46,6 @@
                 <span class="text-base sm:text-xl font-extrabold tracking-wide text-white">ČESKÉ <span class="text-brandCyan">HOLKY</span></span>
             </div>
 
-            <!-- Funkční textové záložky -->
             <nav class="flex items-center space-x-1 sm:space-x-3 text-xs sm:text-sm font-medium overflow-x-auto py-2">
                 <button onclick="switchTab('home')" id="tab-btn-home" class="px-2.5 py-1.5 rounded-lg transition text-brandCyan font-semibold bg-white/15 whitespace-nowrap">Úvod</button>
                 <button onclick="switchTab('profiles')" id="tab-btn-profiles" class="px-2.5 py-1.5 rounded-lg transition hover:bg-white/10 text-gray-300 whitespace-nowrap">Profily</button>
@@ -138,9 +137,9 @@
 
     </main>
 
-    <!-- MODAL DETAIL -->
+    <!-- MODAL DETAIL S KATEGORIEMI BIO A GALERIE -->
     <div id="profile-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-5 relative shadow-2xl overflow-y-auto max-h-[90vh]">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-5 relative shadow-2xl overflow-y-auto max-h-[90vh]">
             <button onclick="closeModal()" class="absolute top-4 right-4 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center font-bold">✕</button>
             <div id="modal-content"></div>
         </div>
@@ -152,10 +151,7 @@
 
     <script>
         let defaultProfiles = [
-            { id: 1, name: "ZAMBLI", age: 27, location: "Praha", photosCount: 12, hair: "brunette", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", bio: "Populární česká herečka a modelka s množstvím ocenění." },
-            { id: 2, name: "NIKY", age: 24, location: "Brno", photosCount: 18, hair: "blonde", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80", bio: "Známá tvář moderní produkce, držitelka několika ocenění." },
-            { id: 3, name: "VERČA", age: 29, location: "Ostrava", photosCount: 15, hair: "brunette", image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80", bio: "Vycházející hvězda s nezaměnitelným šarmem." },
-            { id: 4, name: "MARTINA", age: 31, location: "Zlín", photosCount: 20, hair: "redhead", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80", bio: "Ikona oboru s dlouholetou mezinárodní kariérou." }
+            { id: 1, name: "ZAMBLI", age: 27, location: "Praha", gallery: ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"], hair: "brunette", bio: "Populární česká herečka a modelka s množstvím ocenění." }
         ];
 
         let defaultArticles = [
@@ -228,16 +224,19 @@
 
         function createCard(p) {
             const isFav = favorites.includes(p.id);
+            const totalPhotos = p.gallery ? p.gallery.length : (p.image ? 1 : 0);
+            const coverImg = p.gallery && p.gallery.length > 0 ? p.gallery[0] : p.image;
+
             return `
                 <div class="profile-card bg-white rounded-3xl p-4 border border-gray-100 shadow-sm relative flex flex-col">
                     <button onclick="toggleFav(${p.id})" class="absolute top-5 right-5 z-10 bg-white/90 p-2 rounded-full shadow hover:scale-110 transition">
                         ${isFav ? '❤️' : '🤍'}
                     </button>
                     <div class="w-full h-60 rounded-2xl overflow-hidden mb-3 bg-gray-100 cursor-pointer" onclick="openDetail(${p.id})">
-                        <img src="${p.image}" class="w-full h-full object-cover">
+                        <img src="${coverImg}" class="w-full h-full object-cover">
                     </div>
                     <h3 class="font-bold text-base text-gray-900 mb-1">${p.name}</h3>
-                    <p class="text-[11px] text-gray-500 mb-3">📍 ${p.location || 'ČR'} | 🎂 ${p.age} let | 📷 ${p.photosCount || 12} fotek</p>
+                    <p class="text-[11px] text-gray-500 mb-3">📍 ${p.location || 'ČR'} | 🎂 ${p.age} let | 📷 ${totalPhotos} fotek</p>
                     <button onclick="openDetail(${p.id})" class="mt-auto w-full bg-navyDark text-white py-2.5 rounded-xl text-xs font-semibold shadow">Zobrazit profil</button>
                 </div>
             `;
@@ -250,21 +249,58 @@
             filterAndRenderProfiles();
         }
 
+        // OTEVŘENÍ DETAILU S KATEGORIEMI BIO A GALERIE
         function openDetail(id) {
             const p = profiles.find(x => x.id === id);
             if(!p) return;
+            const galleryArray = p.gallery && p.gallery.length > 0 ? p.gallery : [p.image];
+
             document.getElementById('modal-content').innerHTML = `
                 <div class="flex flex-col items-center">
-                    <div class="w-full h-64 rounded-2xl overflow-hidden mb-4 shadow bg-gray-100">
-                        <img src="${p.image}" class="w-full h-full object-cover">
+                    <h2 class="text-xl font-extrabold mb-1">${p.name}</h2>
+                    <p class="text-xs text-gray-500 mb-4">📍 ${p.location || 'ČR'} | 🎂 ${p.age} let | 📷 ${galleryArray.length} fotek</p>
+                    
+                    <!-- Přepínací tlačítka kategorií (Bio / Galerie) -->
+                    <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full mb-4">
+                        <button onclick="switchModalTab('bio')" id="modal-tab-bio" class="flex-1 py-2 text-xs font-bold rounded-lg bg-navyDark text-white transition">📖 Bio</button>
+                        <button onclick="switchModalTab('gallery')" id="modal-tab-gallery" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 hover:bg-gray-200 transition">🖼️ Galerie (${galleryArray.length})</button>
                     </div>
-                    <h2 class="text-xl font-bold mb-1">${p.name}</h2>
-                    <p class="text-xs text-gray-500 mb-3">📍 ${p.location || 'ČR'} | 🎂 ${p.age} let | 📷 ${p.photosCount || 12} fotek</p>
-                    <p class="text-xs text-gray-600 text-center mb-5">${p.bio || 'Bez popisu.'}</p>
-                    <button onclick="closeModal()" class="w-full bg-navyDark text-white py-2.5 rounded-xl text-xs font-semibold">Zavřít</button>
+
+                    <!-- Obsah záložky BIO -->
+                    <div id="modal-content-bio" class="w-full text-xs text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-2xl border mb-4">
+                        ${p.bio || 'Žádný životopis není k dispozici.'}
+                    </div>
+
+                    <!-- Obsah záložky GALERIE (skryto ve výchozím stavu) -->
+                    <div id="modal-content-gallery" class="w-full hidden space-y-3 max-h-72 overflow-y-auto pr-1">
+                        <div class="grid grid-cols-2 gap-2">
+                            ${galleryArray.map(img => `<div class="h-36 rounded-xl overflow-hidden bg-gray-100 shadow-sm"><img src="${img}" class="w-full h-full object-cover"></div>`).join('')}
+                        </div>
+                    </div>
+
+                    <button onclick="closeModal()" class="w-full bg-navyDark text-white py-2.5 rounded-xl text-xs font-semibold mt-2">Zavřít</button>
                 </div>
             `;
             document.getElementById('profile-modal').classList.remove('hidden');
+        }
+
+        function switchModalTab(tab) {
+            const bioTab = document.getElementById('modal-content-bio');
+            const galleryTab = document.getElementById('modal-content-gallery');
+            const btnBio = document.getElementById('modal-tab-bio');
+            const btnGallery = document.getElementById('modal-tab-gallery');
+
+            if (tab === 'bio') {
+                bioTab.classList.remove('hidden');
+                galleryTab.classList.add('hidden');
+                btnBio.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-navyDark text-white transition";
+                btnGallery.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 hover:bg-gray-200 transition";
+            } else {
+                bioTab.classList.add('hidden');
+                galleryTab.classList.remove('hidden');
+                btnGallery.className = "flex-1 py-2 text-xs font-bold rounded-lg bg-navyDark text-white transition";
+                btnBio.className = "flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 hover:bg-gray-200 transition";
+            }
         }
 
         function closeModal() {
