@@ -23,7 +23,7 @@
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
                 <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Statistiky a správa odkazů a obsahu</p>
+                <p class="text-xs text-gray-400 mt-0.5">Statistiky a správa obsahu</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
@@ -64,7 +64,6 @@
                 </form>
             </div>
 
-            <!-- SPRÁVA ODKAZŮ -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📋 Správa existujících odkazů</h2>
                 <div id="admin-links-list" class="space-y-2"></div>
@@ -77,7 +76,7 @@
                 <button onclick="saveAdCode()" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold">Uložit reklamu</button>
             </div>
 
-            <!-- Přidat profil -->
+            <!-- PŘIDAT PROFIL (Odděleně profilový obrázek a galerie) -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">➕ Přidat nový profil herečky</h2>
                 <form onsubmit="addNewProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -89,12 +88,19 @@
                         <option value="brunette">Brunetka</option>
                         <option value="redhead">Zrzka</option>
                     </select>
-                    <div class="sm:col-span-2">
-                        <label class="block text-[11px] text-gray-400 mb-1">Vybrat fotky do galerie:</label>
-                        <input type="file" id="p-image-files" accept="image/*" multiple required class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
+
+                    <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
+                        <label class="block text-[11px] font-bold text-brandBlue mb-1">1. Hlavní profilový obrázek (náhled na kartě):</label>
+                        <input type="file" id="p-profile-img" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
                     </div>
+
+                    <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
+                        <label class="block text-[11px] font-bold text-brandPink mb-1">2. Fotografie do galerie (můžete vybrat více fotek najednou):</label>
+                        <input type="file" id="p-gallery-files" accept="image/*" multiple required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandPink file:text-white">
+                    </div>
+
                     <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs" rows="2"></textarea>
-                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit profil</button>
+                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit profil do databáze</button>
                 </form>
             </div>
 
@@ -129,7 +135,6 @@
             alert('Reklamní kód byl uložen!');
         }
 
-        // PŘIDÁNÍ ODKAZU S BANNEREM Z MOBILU
         function addNewLink(e) {
             e.preventDefault();
             const fileInput = document.getElementById('l-banner-file');
@@ -181,24 +186,41 @@
             }
         }
 
+        // ZPRACOVÁNÍ PROFILU S ODLIŠNOU PROFILOVKOU A GALERIÍ
         function addNewProfile(e) {
             e.preventDefault();
-            const fileInput = document.getElementById('p-image-files');
-            if (fileInput.files && fileInput.files.length > 0) {
+            const profileImgInput = document.getElementById('p-profile-img');
+            const galleryInput = document.getElementById('p-gallery-files');
+
+            if (!profileImgInput.files || !profileImgInput.files[0]) {
+                alert('Vyberte hlavní profilový obrázek.');
+                return;
+            }
+            if (!galleryInput.files || galleryInput.files.length === 0) {
+                alert('Vyberte alespoň jednu fotku do galerie.');
+                return;
+            }
+
+            const profileReader = new FileReader();
+            profileReader.onload = function(profileEvent) {
+                const profileImgUrl = profileEvent.target.result;
+                
                 let galleryUrls = [];
                 let filesLoaded = 0;
-                Array.from(fileInput.files).forEach((file, index) => {
+                
+                Array.from(galleryInput.files).forEach((file, index) => {
                     const reader = new FileReader();
                     reader.onload = function(event) {
                         galleryUrls[index] = event.target.result;
                         filesLoaded++;
-                        if (filesLoaded === fileInput.files.length) {
+                        if (filesLoaded === galleryInput.files.length) {
                             profiles.push({
                                 id: Date.now(),
                                 name: document.getElementById('p-name').value.toUpperCase(),
                                 age: parseInt(document.getElementById('p-age').value),
                                 location: document.getElementById('p-location').value,
                                 hair: document.getElementById('p-hair').value,
+                                profileImage: profileImgUrl,
                                 gallery: galleryUrls,
                                 bio: document.getElementById('p-bio').value,
                                 createdAt: Date.now()
@@ -210,9 +232,8 @@
                     };
                     reader.readAsDataURL(file);
                 });
-            } else {
-                alert('Vyberte alespoň jednu fotku.');
-            }
+            };
+            profileReader.readAsDataURL(profileImgInput.files[0]);
         }
 
         function renderAdminProfiles() {
@@ -222,13 +243,13 @@
                 return;
             }
             list.innerHTML = profiles.map(p => {
-                const cover = p.gallery && p.gallery.length > 0 ? p.gallery[0] : p.image;
-                const count = p.gallery ? p.gallery.length : 1;
+                const cover = p.profileImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
+                const count = p.gallery ? p.gallery.length : 0;
                 return `
                     <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
                         <div class="flex items-center space-x-2">
                             <img src="${cover}" class="w-8 h-8 rounded-lg object-cover">
-                            <span class="font-bold">${p.name} (${count} fotek)</span>
+                            <span class="font-bold">${p.name} (${count} fotek v galerii)</span>
                         </div>
                         <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
                     </div>
