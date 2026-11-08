@@ -36,7 +36,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- REKLAMNÍ BANNER (Bez počítadla) -->
+    <!-- REKLAMNÍ BANNER -->
     <div class="bg-navyDark text-white text-center py-2 px-3 text-[11px] tracking-wider uppercase border-b border-gray-800">
         <span id="ad-banner-slot">✨ Reklama: Získej exkluzivní prémiový přístup! <a href="#" class="underline text-brandCyan ml-2">Zjistit více</a></span>
     </div>
@@ -172,7 +172,7 @@
         <img id="lightbox-img" src="" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl">
     </div>
 
-    <!-- PATIČKA S REÁLNÝM POČÍTADLEM NÁVŠTĚV -->
+    <!-- PATIČKA S VYNULLOVANÝM POČÍTADLEM -->
     <footer class="bg-white border-t py-6 mt-12 text-center text-xs text-gray-500 space-y-2">
         <p>ČESKÉ HOLKY • Všechna práva vyhrazena © 2026</p>
         <p class="text-[11px] text-gray-400">👁️ Celkem zobrazení webu: <strong id="site-visitor-counter" class="text-brandBlue font-bold">0</strong></p>
@@ -203,7 +203,7 @@
         let adCode = localStorage.getItem('ch_adcode') || '';
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Reálné počítadlo v patičce (začíná od reálného počtu)
+            // Vynulování/Inicializace počítadla od 0
             let views = parseInt(localStorage.getItem('ch_site_views') || '0');
             views++;
             localStorage.setItem('ch_site_views', views);
