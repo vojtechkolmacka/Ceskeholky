@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>České Holky – Portál a databáze profilů</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts & Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
+                        navyDark: '#0b1329',
+                        brandBlue: '#0066ff',
                         brandCyan: '#00d2ff',
-                        brandBlue: '#3a7bd5',
                         brandPurple: '#8A2387',
                         brandPink: '#E94057'
                     },
@@ -23,212 +25,452 @@
     </script>
     <style>
         .profile-card { transition: all 0.3s ease; }
-        .profile-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
+        .profile-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
+        /* Skrytí scrollbaru pro čistý vzhled */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- Horní reklamní banner (ovládaný z administrace) -->
-    <div id="ad-banner-slot" class="bg-gray-900 text-white text-center py-2 px-4 text-xs tracking-wider uppercase border-b border-gray-800">
+    <!-- REKLAMNÍ / OZNÁMENÍ BANNER (Ovládaný z administrace) -->
+    <div id="ad-banner-slot" class="bg-navyDark text-white text-center py-2 px-4 text-xs tracking-wider uppercase border-b border-gray-800">
         ✨ Reklama: Získej exkluzivní prémiový přístup! <a href="#" class="underline text-brandCyan ml-2">Zjistit více</a>
     </div>
 
-    <!-- IKONICKÝ HORNÍ BANNER (přesně podle tvé předlohy: modré pozadí, nápis vlevo + 4 tváře vedle sebe) -->
-    <div class="w-full bg-gradient-to-r from-[#00b4db] to-[#0083b0] shadow-lg overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <!-- Logo / Název vlevo -->
-            <div class="text-white font-black text-2xl sm:text-3xl tracking-wider leading-tight drop-shadow-md select-none">
-                ČESKÉ<br><span class="text-yellow-200">HOLKY</span>
+    <!-- ================= DESKTOP & TABLET / MOBILNÍ HLAVIČKA ================= -->
+    <header class="bg-navyDark text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo vlevo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="flex items-center space-x-2">
+                    <div class="w-9 h-9 rounded-full bg-brandCyan/20 border border-brandCyan flex items-center justify-center text-brandCyan">
+                        💙
+                    </div>
+                    <span class="text-xl sm:text-2xl font-extrabold tracking-wide text-white">ČESKÉ <span class="text-brandCyan">HOLKY</span></span>
+                </div>
             </div>
 
-            <!-- Čtveřice ikonických tváří (působivý kolážový banner) -->
-            <div class="flex items-center space-x-1.5 sm:space-x-3">
-                <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 overflow-hidden shadow-md">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
-                </div>
-                <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 overflow-hidden shadow-md">
-                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
-                </div>
-                <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 overflow-hidden shadow-md">
-                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
-                </div>
-                <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 overflow-hidden shadow-md">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
-                </div>
+            <!-- Desktopová navigace -->
+            <nav class="hidden md:flex items-center space-x-1 lg:space-x-4 text-sm font-medium">
+                <button onclick="switchTab('home')" class="nav-btn-home px-3 py-2 rounded-xl hover:bg-white/10 transition flex items-center space-x-1.5 text-brandCyan">
+                    <span>🏠</span> <span>Úvod</span>
+                </button>
+                <button onclick="switchTab('profiles')" class="nav-btn-profiles px-3 py-2 rounded-xl hover:bg-white/10 transition flex items-center space-x-1.5">
+                    <span>👥</span> <span>Profily</span>
+                </button>
+                <button onclick="switchTab('articles')" class="nav-btn-articles px-3 py-2 rounded-xl hover:bg-white/10 transition flex items-center space-x-1.5">
+                    <span>📑</span> <span>Články & Hodnocení</span>
+                </button>
+                <button onclick="switchTab('guestbook')" class="nav-btn-guestbook px-3 py-2 rounded-xl hover:bg-white/10 transition flex items-center space-x-1.5">
+                    <span>✍️</span> <span>Kniha návštěv</span>
+                </button>
+            </nav>
+
+            <!-- Pravá strana: Administrace PWA, Vyhledávání, Hamburger -->
+            <div class="flex items-center space-x-3">
+                <a href="admin.html" class="bg-brandCyan/10 hover:bg-brandCyan/20 text-brandCyan border border-brandCyan/30 px-3.5 py-2 rounded-xl text-xs font-semibold tracking-wider transition flex items-center space-x-1.5 shadow-sm">
+                    <span>⚙️</span> <span class="hidden sm:inline">Administrace PWA</span>
+                </a>
+                
+                <!-- Ikona vyhledávání pro mobil -->
+                <button onclick="toggleMobileSearch()" class="md:hidden p-2 rounded-xl hover:bg-white/10 text-gray-300">
+                    🔍
+                </button>
+
+                <!-- Hamburger menu tlačítko (mobil) -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl hover:bg-white/10 text-gray-300 text-xl">
+                    ☰
+                </button>
             </div>
         </div>
-    </div>
 
-    <!-- Hlavní menu / Navigace -->
-    <header class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <nav class="flex items-center space-x-6 text-sm font-semibold text-gray-700">
-                <button onclick="switchTab('home')" class="hover:text-brandBlue transition">🏠 Úvod</button>
-                <button onclick="switchTab('profiles')" class="hover:text-brandBlue transition">👥 Profily</button>
-                <button onclick="switchTab('articles')" class="hover:text-brandBlue transition">📑 Články & Ocenění</button>
-                <button onclick="switchTab('guestbook')" class="hover:text-brandBlue transition">✍️ Kniha návštěv</button>
-            </nav>
-            <div class="flex items-center space-x-3">
-                <a href="admin.html" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-full text-xs font-semibold tracking-wider transition flex items-center space-x-1">
-                    <span>⚙️ Administrace PWA</span>
-                </a>
-                <div class="hidden sm:flex items-center bg-gray-100 px-3 py-1.5 rounded-full text-xs text-gray-600">
-                    <span>👁️ Zobrazení: <strong id="visitor-counter">142,850</strong></span>
-                </div>
-            </div>
+        <!-- Mobilní rozbalovací menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-navyDark border-t border-gray-800 px-4 pt-2 pb-4 space-y-2">
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-sm">🏠 Úvod</button>
+            <button onclick="switchTab('profiles'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-sm">👥 Profily</button>
+            <button onclick="switchTab('articles'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-sm">📑 Články & Hodnocení</button>
+            <button onclick="switchTab('guestbook'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-sm">✍️ Kniha návštěv</button>
         </div>
     </header>
 
-    <!-- Hlavní obsah -->
+    <!-- ================= NOVÝ ŠIROKOÚHLÝ REKLAMNÍ BANNER (Desktop & Mobil varianty) ================= -->
+    <div class="w-full bg-gradient-to-r from-[#07112c] via-[#0d2354] to-[#04619f] text-white shadow-xl overflow-hidden relative border-b border-blue-900/40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between">
+            
+            <!-- Levá strana banneru: Výrazný nápis -->
+            <div class="z-10 max-w-xs sm:max-w-md">
+                <span class="inline-block bg-brandCyan/20 text-brandCyan text-[10px] sm:text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-1 sm:mb-2 border border-brandCyan/30">Exkluzivní databáze</span>
+                <h1 class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-none drop-shadow-md">
+                    ČESKÉ <span class="text-transparent bg-clip-text bg-gradient-to-r from-brandCyan to-white">HOLKY</span>
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-300 mt-1 sm:mt-2 font-light hidden sm:block">
+                    Objevte ty nejkrásnější tváře, detailní profily, galerie a exkluzivní články na jednom místě.
+                </p>
+            </div>
+
+            <!-- Pravá strana banneru: Čtyři atraktivní dospělé ženy (kruhové portréty s jemným efektem) -->
+            <div class="flex items-center space-x-2 sm:space-x-4 z-10">
+                <div class="relative group">
+                    <div class="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-2 border-brandCyan shadow-lg overflow-hidden transform group-hover:scale-105 transition duration-300">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Zambli" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="relative group">
+                    <div class="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-2 border-white/80 shadow-lg overflow-hidden transform group-hover:scale-105 transition duration-300">
+                        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80" alt="Niky" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="relative group">
+                    <div class="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-2 border-brandCyan shadow-lg overflow-hidden transform group-hover:scale-105 transition duration-300">
+                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80" alt="Verča" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <div class="relative group hidden xs:block">
+                    <div class="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-2 border-white/80 shadow-lg overflow-hidden transform group-hover:scale-105 transition duration-300">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" alt="Martina" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Světelné dekorační prvky pozadí -->
+        <div class="absolute -top-24 -left-24 w-72 h-72 bg-brandCyan/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+    </div>
+
+    <!-- ================= HLAVNÍ OBSAHOVÁ ČÁST ================= -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- TAB: ÚVOD / PROFILY -->
+        <!-- TAB: ÚVOD & PROFILY -->
         <div id="tab-home" class="tab-content">
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                <div class="flex items-center space-x-2">
-                    <span class="bg-brandBlue text-white px-4 py-2 rounded-full text-xs font-bold shadow">Filtry</span>
-                    <select id="filter-hair" onchange="renderProfiles()" class="bg-gray-100 text-sm px-3 py-2 rounded-xl border-0 focus:ring-2 focus:ring-brandBlue">
-                        <option value="">Všechny barvy vlasů</option>
-                        <option value="blonde">Blond</option>
-                        <option value="brunette">Brunetka</option>
-                        <option value="redhead">Zrzka</option>
-                    </select>
-                </div>
-                <div class="w-full sm:w-72">
-                    <input type="text" id="search-input" oninput="renderProfiles()" placeholder="Hledat podle jména..." class="w-full px-4 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brandBlue">
+            
+            <!-- FILTRY A VYHLEDÁVÁNÍ (Jednotný vodorovný řádek pro Desktop, pod sebou pro Mobil) -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-8">
+                <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                    
+                    <!-- Levé filtry -->
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <button class="bg-navyDark text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm flex items-center space-x-1.5">
+                            <span>🔍</span> <span>Filtry</span>
+                        </button>
+                        
+                        <!-- Barva vlasů -->
+                        <select id="filter-hair" onchange="filterAndRenderProfiles()" class="bg-gray-100 hover:bg-gray-200/70 text-xs sm:text-sm px-3 py-2.5 rounded-xl border-0 focus:ring-2 focus:ring-brandBlue font-medium transition cursor-pointer">
+                            <option value="">Všechny barvy vlasů</option>
+                            <option value="blonde">Blond</option>
+                            <option value="brunette">Brunetka</option>
+                            <option value="redhead">Zrzka</option>
+                        </select>
+
+                        <!-- Věk -->
+                        <select id="filter-age" onchange="filterAndRenderProfiles()" class="bg-gray-100 hover:bg-gray-200/70 text-xs sm:text-sm px-3 py-2.5 rounded-xl border-0 focus:ring-2 focus:ring-brandBlue font-medium transition cursor-pointer">
+                            <option value="">Věk: Vše</option>
+                            <option value="18-25">18–25 let</option>
+                            <option value="26-30">26–30 let</option>
+                            <option value="31+">31+ let</option>
+                        </select>
+
+                        <!-- Lokalita -->
+                        <select id="filter-location" onchange="filterAndRenderProfiles()" class="bg-gray-100 hover:bg-gray-200/70 text-xs sm:text-sm px-3 py-2.5 rounded-xl border-0 focus:ring-2 focus:ring-brandBlue font-medium transition cursor-pointer">
+                            <option value="">Lokalita: Vše</option>
+                            <option value="Praha">Praha</option>
+                            <option value="Brno">Brno</option>
+                            <option value="Ostrava">Ostrava</option>
+                            <option value="Zlín">Zlín</option>
+                        </select>
+                    </div>
+
+                    <!-- Pravé vyhledávání podle jména -->
+                    <div class="w-full md:w-72">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 text-xs">🔎</span>
+                            <input type="text" id="search-input" oninput="filterAndRenderProfiles()" placeholder="Hledat podle jména..." class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brandBlue bg-gray-50/50">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div id="profiles-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+            <!-- PROFILOVÉ KARTY (Grid 3-4 sloupce na desktopu, 1 sloupec na mobilu) -->
+            <div id="profiles-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Dynamicky generováno JavaScriptem ze stávající databáze -->
+            </div>
         </div>
 
-        <!-- TAB: PROFILY -->
+        <!-- TAB: PROFILY (Samostatná záložka) -->
         <div id="tab-profiles" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-6 text-gray-900">Kompletní databáze profilů</h2>
-            <div id="profiles-full-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Kompletní databáze profilů</h2>
+                <span id="profiles-count" class="text-xs font-semibold bg-gray-200 text-gray-700 px-3 py-1 rounded-full">0 profilů</span>
+            </div>
+            <div id="profiles-full-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Dynamicky generováno -->
+            </div>
         </div>
 
-        <!-- TAB: ČLÁNKY -->
+        <!-- TAB: ČLÁNKY & HODNOCENÍ -->
         <div id="tab-articles" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-6 text-gray-900">Články, rubriky a ocenění</h2>
-            <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Články, rubriky & ocenění</h2>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Odborné recenze, historické ohlédnutí a exkluzivní materiály.</p>
+            </div>
+            <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dynamicky generováno z localStorage -->
+            </div>
         </div>
 
         <!-- TAB: KNIHA NÁVŠTĚV -->
         <div id="tab-guestbook" class="tab-content hidden">
-            <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-2xl font-bold mb-4 text-gray-900">Kniha návštěv</h2>
+            <div class="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Kniha návštěv</h2>
+                <p class="text-xs sm:text-sm text-gray-500 mb-6">Podělte se o svůj názor, zanechte vzkaz nebo pozdrav ostatním návštěvníkům portálu.</p>
+                
                 <form id="guestbook-form" onsubmit="addGuestbookEntry(event)" class="space-y-4 mb-8">
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Vaše jméno</label>
-                        <input type="text" id="gb-name" required class="w-full px-4 py-2 rounded-xl border text-sm">
+                        <input type="text" id="gb-name" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-brandBlue bg-gray-50/50">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Vzkaz</label>
-                        <textarea id="gb-message" rows="3" required class="w-full px-4 py-2 rounded-xl border text-sm"></textarea>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Váš vzkaz</label>
+                        <textarea id="gb-message" rows="3" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-brandBlue bg-gray-50/50"></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-brandBlue text-white py-2.5 rounded-xl font-semibold text-sm shadow">Odeslat vzkaz</button>
+                    <button type="submit" class="w-full bg-navyDark hover:bg-black text-white py-3 rounded-xl font-semibold text-sm shadow-md transition">Odeslat vzkaz</button>
                 </form>
-                <div id="guestbook-list" class="space-y-4"></div>
+
+                <div id="guestbook-list" class="space-y-4">
+                    <!-- Dynamicky generované vzkazy -->
+                </div>
             </div>
         </div>
 
     </main>
 
-    <!-- Modální detail profilu -->
-    <div id="profile-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 relative shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-4 right-4 bg-gray-100 w-9 h-9 rounded-full font-bold">✕</button>
-            <div id="modal-content"></div>
+    <!-- ================= MODÁLNÍ OKNO DETAILU PROFILU ================= -->
+    <div id="profile-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 relative shadow-2xl overflow-y-auto max-h-[90vh]">
+            <button onclick="closeModal()" class="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 w-9 h-9 rounded-full flex items-center justify-center text-gray-700 font-bold transition">✕</button>
+            <div id="modal-content">
+                <!-- Naplněno dynamicky -->
+            </div>
         </div>
     </div>
 
-    <footer class="bg-white border-t py-6 mt-12 text-center text-xs text-gray-500">
-        ČESKÉ HOLKY • Všechna práva vyhrazena © 2026
+    <!-- ================= MOBILNÍ SPODNÍ NAVIGAČNÍ LIŠTA (Pohodlný přístup pro mobilní zařízení) ================= -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-navyDark/95 backdrop-blur border-t border-gray-800 z-40 px-4 py-2 flex justify-around items-center text-white text-center">
+        <button onclick="switchTab('home')" class="flex flex-col items-center space-y-0.5 text-brandCyan py-1">
+            <span class="text-lg">🏠</span>
+            <span class="text-[10px] font-medium">Úvod</span>
+        </button>
+        <button onclick="switchTab('profiles')" class="flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white py-1">
+            <span class="text-lg">👥</span>
+            <span class="text-[10px] font-medium">Profily</span>
+        </button>
+        <button onclick="switchTab('articles')" class="flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white py-1">
+            <span class="text-lg">📑</span>
+            <span class="text-[10px] font-medium">Články</span>
+        </button>
+        <button onclick="switchTab('guestbook')" class="flex flex-col items-center space-y-0.5 text-gray-400 hover:text-white py-1">
+            <span class="text-lg">✍️</span>
+            <span class="text-[10px] font-medium">Vzkazy</span>
+        </button>
+        <a href="admin.html" class="flex flex-col items-center space-y-0.5 text-brandCyan py-1">
+            <span class="text-lg">⚙️</span>
+            <span class="text-[10px] font-medium">Admin</span>
+        </a>
+    </div>
+
+    <!-- Patička webu -->
+    <footer class="bg-white border-t border-gray-100 py-8 mt-12 mb-16 md:mb-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500">
+            <p>ČESKÉ HOLKY • Všechna práva vyhrazena © 2026</p>
+            <div class="flex space-x-6 mt-4 sm:mt-0 font-medium">
+                <a href="#" class="hover:text-brandBlue transition">Podmínky použití</a>
+                <a href="#" class="hover:text-brandBlue transition">Ochrana soukromí</a>
+                <a href="admin.html" class="text-brandCyan font-bold">Administrace PWA</a>
+            </div>
+        </div>
     </footer>
 
+    <!-- ================= JAVASCRIPT LOGIKA & PROPOJENÍ S PWA ADMINEM ================= -->
     <script>
-        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [
-            { id: 1, name: "ZAMBLI", age: 29, height: "160 cm", measurements: "90-60-90", hair: "brunette", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80", bio: "Populární česká herečka a modelka s množstvím ocenění." },
-            { id: 2, name: "DOLVE", age: 29, height: "175 cm", measurements: "88-58-88", hair: "blonde", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=500&q=80", bio: "Známá tvář evropské produkce, držitelka ceny za nejlepší debut." }
+        // Výchozí databáze profilů (pokud v localStorage ještě nic není, zachováváme kompletní původní data a strukturu)
+        let defaultProfiles = [
+            { id: 1, name: "ZAMBLI", age: 27, location: "Praha", photosCount: 12, hair: "brunette", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", bio: "Populární česká herečka a modelka s množstvím mezinárodních ocenění a bohatou filmografií v evropské produkci." },
+            { id: 2, name: "NIKY", age: 24, location: "Brno", photosCount: 18, hair: "blonde", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80", bio: "Známá tvář moderní produkce, držitelka několika ocenění za nejlepší debut a komediální výkony." },
+            { id: 3, name: "VERČA", age: 29, location: "Ostrava", photosCount: 15, hair: "brunette", image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80", bio: "Vycházející hvězda s nezaměnitelným šarmem, dravým stylem a obrovskou fanouškovskou základnou." },
+            { id: 4, name: "MARTINA", age: 31, location: "Zlín", photosCount: 20, hair: "redhead", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80", bio: "Ikona oboru s dlouholetou mezinárodní kariérou, precizním vystupováním a nezapomenutelným vzhledem." }
         ];
-        let articles = JSON.parse(localStorage.getItem('ch_articles')) || [
-            { title: "Historie české adult produkce", date: "1. 11. 2026", content: "Jak se česká tvář prosadila na světové scéně." }
+
+        let defaultArticles = [
+            { title: "Historie a vývoj české adult produkce", date: "1. 11. 2026", content: "Jak se české herečky prosadily na světové scéně a které ikony stály u zrodu moderní éry v našich končinách." },
+            { title: "Přehled nejvýznamnějších ocenění", date: "15. 10. 2026", content: "Kdo si odnesl prestižní trofeje na evropských festivalech a jaké milníky stojí za pozornost." }
         ];
-        let guestbook = JSON.parse(localStorage.getItem('ch_guestbook')) || [
-            { name: "Petr", message: "Skvělý portál!", date: "7. 11. 2026" }
+
+        let defaultGuestbook = [
+            { name: "Petr", message: "Skvělý redizajnovaný portál, konečně přehledné a rychlé na mobilu!", date: "7. 11. 2026" }
         ];
+
+        // Načtení dat z localStorage (propojení s PWA administrací)
+        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || defaultProfiles;
+        let articles = JSON.parse(localStorage.getItem('ch_articles')) || defaultArticles;
+        let guestbook = JSON.parse(localStorage.getItem('ch_guestbook')) || defaultGuestbook;
+        let favorites = JSON.parse(localStorage.getItem('ch_favorites')) || [];
         let adCode = localStorage.getItem('ch_adcode') || '';
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderProfiles();
+            filterAndRenderProfiles();
             renderArticles();
             renderGuestbook();
-            if(adCode) document.getElementById('ad-banner-slot').innerHTML = adCode;
-            document.getElementById('visitor-counter').innerText = (142850 + Math.floor(Math.random() * 100)).toLocaleString();
+            
+            if(adCode) {
+                document.getElementById('ad-banner-slot').innerHTML = adCode;
+            }
         });
 
+        // Přepínání záložek
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            if(tabId === 'profiles') renderFullProfiles();
+            
+            if(tabId === 'profiles') {
+                renderFullProfiles();
+            }
         }
 
-        function renderProfiles() {
-            const grid = document.getElementById('profiles-grid');
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function toggleMobileSearch() {
+            const searchInput = document.getElementById('search-input');
+            searchInput.focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Filtrování a vykreslování profilů
+        function filterAndRenderProfiles() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const hair = document.getElementById('filter-hair').value;
-            const filtered = profiles.filter(p => p.name.toLowerCase().includes(search) && (hair === '' || p.hair === hair));
-            grid.innerHTML = filtered.map(p => cardHtml(p)).join('');
+            const ageGroup = document.getElementById('filter-age').value;
+            const location = document.getElementById('filter-location').value;
+
+            const filtered = profiles.filter(p => {
+                const matchSearch = p.name.toLowerCase().includes(search);
+                const matchHair = !hair || p.hair === hair;
+                const matchLoc = !location || p.location === location;
+                
+                let matchAge = true;
+                if (ageGroup === '18-25') matchAge = p.age >= 18 && p.age <= 25;
+                if (ageGroup === '26-30') matchAge = p.age >= 26 && p.age <= 30;
+                if (ageGroup === '31+') matchAge = p.age >= 31;
+
+                return matchSearch && matchHair && matchLoc && matchAge;
+            });
+
+            const grid = document.getElementById('profiles-grid');
+            grid.innerHTML = filtered.map(p => createProfileCard(p)).join('');
         }
 
         function renderFullProfiles() {
-            document.getElementById('profiles-full-grid').innerHTML = profiles.map(p => cardHtml(p)).join('');
+            const grid = document.getElementById('profiles-full-grid');
+            grid.innerHTML = profiles.map(p => createProfileCard(p)).join('');
+            document.getElementById('profiles-count').innerText = profiles.length + ' profilů';
         }
 
-        function cardHtml(p) {
+        // Šablona profilové karty (respektuje dominantní fotografii, lokalitu, věk a tlačítko)
+        function createProfileCard(p) {
+            const isFav = favorites.includes(p.id);
             return `
-                <div class="profile-card bg-white rounded-3xl p-4 border shadow-sm flex flex-col items-center">
-                    <div class="w-full h-56 rounded-2xl overflow-hidden mb-4 bg-gray-100">
-                        <img src="${p.image}" class="w-full h-full object-cover">
+                <div class="profile-card bg-white rounded-3xl p-4 border border-gray-100 shadow-sm relative flex flex-col">
+                    <!-- Tlačítko oblíbené -->
+                    <button onclick="toggleFavorite(${p.id})" class="absolute top-7 right-7 z-10 bg-white/90 backdrop-blur-md p-2.5 rounded-full shadow-md hover:scale-110 transition">
+                        ${isFav ? '❤️' : '🤍'}
+                    </button>
+                    
+                    <!-- Dominantní fotografie -->
+                    <div class="w-full h-72 rounded-2xl overflow-hidden mb-4 bg-gray-100 relative cursor-pointer" onclick="openProfileDetail(${p.id})">
+                        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
                     </div>
-                    <h3 class="font-bold text-lg text-gray-900 mb-1">${p.name}</h3>
-                    <p class="text-xs text-gray-500 mb-3 text-center">Věk: ${p.age} | Výška: ${p.height} | Míry: ${p.measurements}</p>
-                    <button onclick="openDetail(${p.id})" class="mt-auto w-full bg-brandBlue text-white py-2 rounded-xl text-xs font-semibold shadow">DETAILNÍ PROFIL</button>
+
+                    <!-- Jméno -->
+                    <h3 class="font-extrabold text-lg text-gray-900 tracking-wide mb-1">${p.name}</h3>
+
+                    <!-- Detaily (lokalita, věk, počet fotek) -->
+                    <div class="flex items-center space-x-3 text-xs text-gray-500 mb-4 font-medium">
+                        <span class="flex items-center">📍 ${p.location || 'ČR'}</span>
+                        <span>•</span>
+                        <span>🎂 ${p.age} let</span>
+                        <span>•</span>
+                        <span>📷 ${p.photosCount || 12} fotek</span>
+                    </div>
+
+                    <!-- Výrazné tlačítko Zobrazit profil -->
+                    <button onclick="openProfileDetail(${p.id})" class="mt-auto w-full bg-navyDark hover:bg-black text-white py-3 rounded-2xl text-xs font-bold tracking-wider shadow-md hover:shadow-lg transition flex items-center justify-center space-x-1.5">
+                        <span>Zobrazit profil</span>
+                        <span>→</span>
+                    </button>
                 </div>
             `;
         }
 
-        function openDetail(id) {
-            const p = profiles.find(x => x.id === id);
+        // Oblíbené
+        function toggleFavorite(id) {
+            if(favorites.includes(id)) {
+                favorites = favorites.filter(fav => fav !== id);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('ch_favorites', JSON.stringify(favorites));
+            filterAndRenderProfiles();
+        }
+
+        // Modální okno detailu
+        function openProfileDetail(id) {
+            const p = profiles.find(item => item.id === id);
             if(!p) return;
             document.getElementById('modal-content').innerHTML = `
                 <div class="flex flex-col items-center">
-                    <img src="${p.image}" class="w-40 h-40 rounded-2xl object-cover shadow-md mb-4">
-                    <h2 class="text-2xl font-extrabold mb-1">${p.name}</h2>
-                    <p class="text-xs text-gray-500 mb-4">Věk: ${p.age} | Výška: ${p.height} | Míry: ${p.measurements}</p>
-                    <p class="text-sm text-gray-600 text-center mb-6">${p.bio}</p>
-                    <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="w-full bg-gray-900 text-white py-2 rounded-xl text-sm">Zavřít</button>
+                    <div class="w-full h-80 rounded-2xl overflow-hidden mb-4 shadow-md bg-gray-100">
+                        <img src="${p.image}" class="w-full h-full object-cover">
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-1">${p.name}</h2>
+                    <div class="flex space-x-4 text-xs font-semibold text-gray-600 mb-4 bg-gray-100 px-4 py-2 rounded-xl">
+                        <span>📍 ${p.location || 'ČR'}</span> • <span>🎂 ${p.age} let</span> • <span>📷 ${p.photosCount || 12} fotek</span>
+                    </div>
+                    <p class="text-sm text-gray-600 text-center mb-6 leading-relaxed px-2">${p.bio || 'Bez doplňujícího popisu.'}</p>
+                    <button onclick="closeModal()" class="w-full bg-navyDark text-white py-3 rounded-2xl text-xs font-bold uppercase tracking-wider shadow">Zavřít okno</button>
                 </div>
             `;
             document.getElementById('profile-modal').classList.remove('hidden');
         }
 
+        function closeModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        // Články
         function renderArticles() {
-            document.getElementById('articles-grid').innerHTML = articles.map(a => `
-                <div class="bg-white p-6 rounded-3xl border shadow-sm">
-                    <span class="text-xs font-semibold text-brandPink">${a.date}</span>
-                    <h3 class="text-lg font-bold mt-1 mb-2">${a.title}</h3>
-                    <div class="text-sm text-gray-600 space-y-2">${a.content}</div>
+            const grid = document.getElementById('articles-grid');
+            grid.innerHTML = articles.map(a => `
+                <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                    <span class="text-xs font-semibold text-brandCyan bg-navyDark px-2.5 py-1 rounded-full">${a.date}</span>
+                    <h3 class="text-lg font-bold text-gray-900 mt-3 mb-2">${a.title}</h3>
+                    <div class="text-sm text-gray-600 leading-relaxed">${a.content}</div>
                 </div>
             `).join('');
         }
 
+        // Kniha návštěv
         function renderGuestbook() {
-            document.getElementById('guestbook-list').innerHTML = guestbook.map(g => `
-                <div class="bg-gray-50 p-4 rounded-2xl border">
-                    <div class="flex justify-between items-center mb-1"><strong class="text-sm">${g.name}</strong><span class="text-xs text-gray-400">${g.date}</span></div>
+            const list = document.getElementById('guestbook-list');
+            list.innerHTML = guestbook.map(g => `
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <div class="flex justify-between items-center mb-1">
+                        <strong class="text-sm text-gray-900">${g.name}</strong>
+                        <span class="text-xs text-gray-400">${g.date}</span>
+                    </div>
                     <p class="text-sm text-gray-600">${g.message}</p>
                 </div>
             `).join('');
@@ -236,14 +478,15 @@
 
         function addGuestbookEntry(e) {
             e.preventDefault();
-            guestbook.unshift({
-                name: document.getElementById('gb-name').value,
-                message: document.getElementById('gb-message').value,
-                date: new Date().toLocaleDateString('cs-CZ')
-            });
+            const name = document.getElementById('gb-name').value;
+            const message = document.getElementById('gb-message').value;
+            const date = new Date().toLocaleDateString('cs-CZ');
+
+            guestbook.unshift({ name, message, date });
             localStorage.setItem('ch_guestbook', JSON.stringify(guestbook));
             document.getElementById('guestbook-form').reset();
             renderGuestbook();
+            alert('Vzkaz byl úspěšně přidán do knihy návštěv!');
         }
     </script>
 </body>
