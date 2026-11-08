@@ -22,39 +22,57 @@
         }
     </script>
     <style>
-        .hero-header { background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 50%, #8A2387 100%); }
         .profile-card { transition: all 0.3s ease; }
         .profile-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans">
 
-    <!-- Horní reklamní banner (pro placenou reklamu z administrace) -->
+    <!-- Horní reklamní banner (ovládaný z administrace) -->
     <div id="ad-banner-slot" class="bg-gray-900 text-white text-center py-2 px-4 text-xs tracking-wider uppercase border-b border-gray-800">
         ✨ Reklama: Získej exkluzivní prémiový přístup! <a href="#" class="underline text-brandCyan ml-2">Zjistit více</a>
     </div>
 
-    <!-- Hlavní hlavička -->
-    <header class="hero-header text-white shadow-lg sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
-                <div class="bg-white text-brandBlue font-extrabold text-xl px-3 py-1.5 rounded-xl shadow-md tracking-wider">
-                    ČESKÉ<br><span class="text-brandPink text-lg">HOLKY</span>
-                </div>
+    <!-- IKONICKÝ HORNÍ BANNER (přesně podle tvé předlohy: modré pozadí, nápis vlevo + 4 tváře vedle sebe) -->
+    <div class="w-full bg-gradient-to-r from-[#00b4db] to-[#0083b0] shadow-lg overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <!-- Logo / Název vlevo -->
+            <div class="text-white font-black text-2xl sm:text-3xl tracking-wider leading-tight drop-shadow-md select-none">
+                ČESKÉ<br><span class="text-yellow-200">HOLKY</span>
             </div>
 
-            <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold">
-                <button onclick="switchTab('home')" class="hover:text-brandCyan transition py-2 px-3 rounded-lg hover:bg-white/10">🏠 Úvod</button>
-                <button onclick="switchTab('profiles')" class="hover:text-brandCyan transition py-2 px-3 rounded-lg hover:bg-white/10">👥 Profily</button>
-                <button onclick="switchTab('articles')" class="hover:text-brandCyan transition py-2 px-3 rounded-lg hover:bg-white/10">📑 Články & Ocenění</button>
-                <button onclick="switchTab('guestbook')" class="hover:text-brandCyan transition py-2 px-3 rounded-lg hover:bg-white/10">✍️ Kniha návštěv</button>
-            </nav>
+            <!-- Čtveřice ikonických tváří (působivý kolážový banner) -->
+            <div class="flex items-center space-x-1.5 sm:space-x-3">
+                <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
+                </div>
+                <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
+                </div>
+                <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
+                </div>
+                <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 overflow-hidden shadow-md">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover">
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Hlavní menu / Navigace -->
+    <header class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <nav class="flex items-center space-x-6 text-sm font-semibold text-gray-700">
+                <button onclick="switchTab('home')" class="hover:text-brandBlue transition">🏠 Úvod</button>
+                <button onclick="switchTab('profiles')" class="hover:text-brandBlue transition">👥 Profily</button>
+                <button onclick="switchTab('articles')" class="hover:text-brandBlue transition">📑 Články & Ocenění</button>
+                <button onclick="switchTab('guestbook')" class="hover:text-brandBlue transition">✍️ Kniha návštěv</button>
+            </nav>
             <div class="flex items-center space-x-3">
-                <a href="admin.html" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-xs font-semibold tracking-wider transition border border-white/30 flex items-center space-x-1">
-                    <span>⚙️ Admin PWA</span>
+                <a href="admin.html" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-full text-xs font-semibold tracking-wider transition flex items-center space-x-1">
+                    <span>⚙️ Administrace PWA</span>
                 </a>
-                <div class="hidden lg:flex items-center bg-black/20 px-3 py-1.5 rounded-full text-xs text-white/90">
+                <div class="hidden sm:flex items-center bg-gray-100 px-3 py-1.5 rounded-full text-xs text-gray-600">
                     <span>👁️ Zobrazení: <strong id="visitor-counter">142,850</strong></span>
                 </div>
             </div>
@@ -64,11 +82,11 @@
     <!-- Hlavní obsah -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- TAB: ÚVOD -->
+        <!-- TAB: ÚVOD / PROFILY -->
         <div id="tab-home" class="tab-content">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-8 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                 <div class="flex items-center space-x-2">
-                    <span class="bg-brandCyan text-white px-4 py-2 rounded-full text-xs font-bold shadow">Filtry</span>
+                    <span class="bg-brandBlue text-white px-4 py-2 rounded-full text-xs font-bold shadow">Filtry</span>
                     <select id="filter-hair" onchange="renderProfiles()" class="bg-gray-100 text-sm px-3 py-2 rounded-xl border-0 focus:ring-2 focus:ring-brandBlue">
                         <option value="">Všechny barvy vlasů</option>
                         <option value="blonde">Blond</option>
@@ -81,9 +99,7 @@
                 </div>
             </div>
 
-            <div id="profiles-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <!-- Generováno JS -->
-            </div>
+            <div id="profiles-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
 
         <!-- TAB: PROFILY -->
@@ -94,7 +110,7 @@
 
         <!-- TAB: ČLÁNKY -->
         <div id="tab-articles" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-6 text-gray-900">Články, rubriki a ocenění</h2>
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">Články, rubriky a ocenění</h2>
             <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
         </div>
 
@@ -111,7 +127,7 @@
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Vzkaz</label>
                         <textarea id="gb-message" rows="3" required class="w-full px-4 py-2 rounded-xl border text-sm"></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-brandBlue to-brandPurple text-white py-2.5 rounded-xl font-semibold text-sm shadow">Odeslat vzkaz</button>
+                    <button type="submit" class="w-full bg-brandBlue text-white py-2.5 rounded-xl font-semibold text-sm shadow">Odeslat vzkaz</button>
                 </form>
                 <div id="guestbook-list" class="space-y-4"></div>
             </div>
@@ -137,7 +153,7 @@
             { id: 2, name: "DOLVE", age: 29, height: "175 cm", measurements: "88-58-88", hair: "blonde", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=500&q=80", bio: "Známá tvář evropské produkce, držitelka ceny za nejlepší debut." }
         ];
         let articles = JSON.parse(localStorage.getItem('ch_articles')) || [
-            { title: "Historie české adult produkce", date: "1. 11. 2026", perex: "Jak se česká tvář prosadila na světové scéně." }
+            { title: "Historie české adult produkce", date: "1. 11. 2026", content: "Jak se česká tvář prosadila na světové scéně." }
         ];
         let guestbook = JSON.parse(localStorage.getItem('ch_guestbook')) || [
             { name: "Petr", message: "Skvělý portál!", date: "7. 11. 2026" }
@@ -179,7 +195,7 @@
                     </div>
                     <h3 class="font-bold text-lg text-gray-900 mb-1">${p.name}</h3>
                     <p class="text-xs text-gray-500 mb-3 text-center">Věk: ${p.age} | Výška: ${p.height} | Míry: ${p.measurements}</p>
-                    <button onclick="openDetail(${p.id})" class="mt-auto w-full bg-gradient-to-r from-brandBlue to-brandPurple text-white py-2 rounded-xl text-xs font-semibold shadow">DETAILNÍ PROFIL</button>
+                    <button onclick="openDetail(${p.id})" class="mt-auto w-full bg-brandBlue text-white py-2 rounded-xl text-xs font-semibold shadow">DETAILNÍ PROFIL</button>
                 </div>
             `;
         }
@@ -204,7 +220,7 @@
                 <div class="bg-white p-6 rounded-3xl border shadow-sm">
                     <span class="text-xs font-semibold text-brandPink">${a.date}</span>
                     <h3 class="text-lg font-bold mt-1 mb-2">${a.title}</h3>
-                    <p class="text-sm text-gray-600">${a.perex}</p>
+                    <div class="text-sm text-gray-600 space-y-2">${a.content}</div>
                 </div>
             `).join('');
         }
