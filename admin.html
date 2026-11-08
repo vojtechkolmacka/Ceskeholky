@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Administrace – České Holky</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brandBlue: '#3a7bd5', brandPink: '#E94057' },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Hlavička adminu -->
+        <div class="flex justify-between items-center mb-8 bg-gray-800 p-6 rounded-3xl border border-gray-700 shadow-xl">
+            <div>
+                <h1 class="text-2xl font-extrabold text-white">⚙️ PWA Administrace</h1>
+                <p class="text-xs text-gray-400 mt-1">Správa profilů, článků, knihy návštěv a placené reklamy</p>
+            </div>
+            <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Placená reklama -->
+            <div class="bg-gray-800 p-6 rounded-3xl border border-gray-700">
+                <h2 class="text-lg font-bold mb-2">📢 Kód pro placenou reklamu</h2>
+                <p class="text-xs text-gray-400 mb-4">Vložte HTML/JS kód reklamního systému (zobrazí se nahoře na webu).</p>
+                <textarea id="admin-ad-code" rows="3" class="w-full p-3 text-xs font-mono rounded-xl bg-gray-900 border border-gray-700 text-white mb-3" placeholder="<script>...</script>"></textarea>
+                <button onclick="saveAdCode()" class="bg-brandBlue text-white px-5 py-2.5 rounded-xl text-xs font-semibold">Uložit reklamu</button>
+            </div>
+
+            <!-- Přidat holku -->
+            <div class="bg-gray-800 p-6 rounded-3xl border border-gray-700">
+                <h2 class="text-lg font-bold mb-4">➕ Přidat nový profil herečky</h2>
+                <form onsubmit="addNewProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <input type="text" id="p-name" placeholder="Jméno (např. ZAMBLI)" required class="p-3 rounded-xl bg-gray-900 border border-gray-700 text-sm">
+                    <input type="number" id="p-age" placeholder="Věk" required class="p-3 rounded-xl bg-gray-900 border border-gray-700 text-sm">
+                    <input type="text" id="p-height" placeholder="Výška (např. 165 cm)" required class="p-3 rounded-xl bg-gray-900 border border-gray-700 text-sm">
+                    <input type="text" id="p-measurements" placeholder="Míry (např. 90-60-90)" required class="p-3 rounded-xl bg-gray-900 border border-gray-700 text-sm">
+                    <select id="p-hair" class="p-3 rounded-xl bg-gray-900 border border-gray-700 text-sm">
+                        <option value="blonde">Blond</option>
+                        <option value="brunette">Brunetka</option>
+                        <option value="redhead">Zrzka</option>
+                    </select>
+                    <input type="url" id="p-image" placeholder="URL fotky (odkaz na obrázek)" required class="p-3 rounded-xl bg-gray-900 border border-gray-700 text-sm">
+                    <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-3 rounded-xl bg-gray-900 border border-gray-700 text-sm" rows="2"></textarea>
+                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-3 rounded-xl font-semibold text-sm shadow">Uložit a přidat profil</button>
+                </form>
+            </div>
+
+            <!-- Správa profilů -->
+            <div class="bg-gray-800 p-6 rounded-3xl border border-gray-700">
+                <h2 class="text-lg font-bold mb-4">📋 Seznam existujících profilů</h2>
+                <div id="admin-profiles-list" class="space-y-3"></div>
+            </div>
+
+            <!-- Správa knihy návštěv -->
+            <div class="bg-gray-800 p-6 rounded-3xl border border-gray-700">
+                <h2 class="text-lg font-bold mb-4">✍️ Moderování knihy návštěv</h2>
+                <div id="admin-guestbook-list" class="space-y-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [];
+        let guestbook = JSON.parse(localStorage.getItem('ch_guestbook')) || [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedAd = localStorage.getItem('ch_adcode');
+            if(savedAd) document.getElementById('admin-ad-code').value = savedAd;
+            renderAdminProfiles();
+            renderAdminGuestbook();
+        });
+
+        function saveAdCode() {
+            const code = document.getElementById('admin-ad-code').value;
+            localStorage.setItem('ch_adcode', code);
+            alert('Reklamní kód byl úspěšně uložen!');
+        }
+
+        function addNewProfile(e) {
+            e.preventDefault();
+            const newP = {
+                id: Date.now(),
+                name: document.getElementById('p-name').value.toUpperCase(),
+                age: document.getElementById('p-age').value,
+                height: document.getElementById('p-height').value,
+                measurements: document.getElementById('p-measurements').value,
+                hair: document.getElementById('p-hair').value,
+                image: document.getElementById('p-image').value,
+                bio: document.getElementById('p-bio').value
+            };
+            profiles.push(newP);
+            localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+            e.target.reset();
+            renderAdminProfiles();
+            alert('Profil byl úspěšně přidán!');
+        }
+
+        function renderAdminProfiles() {
+            const list = document.getElementById('admin-profiles-list');
+            if(profiles.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily v databázi.</p>';
+                return;
+            }
+            list.innerHTML = profiles.map(p => `
+                <div class="flex items-center justify-between bg-gray-900 p-3 rounded-xl border border-gray-700 text-sm">
+                    <div class="flex items-center space-x-3">
+                        <img src="${p.image}" class="w-10 h-10 rounded-lg object-cover">
+                        <span class="font-bold">${p.name}</span>
+                    </div>
+                    <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-500/30">Smazat</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteProfile(id) {
+            if(confirm('Opravdu smazat tento profil?')) {
+                profiles = profiles.filter(p => p.id !== id);
+                localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+                renderAdminProfiles();
+            }
+        }
+
+        function renderAdminGuestbook() {
+            const list = document.getElementById('admin-guestbook-list');
+            if(guestbook.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500">Žádné vzkazy.</p>';
+                return;
+            }
+            list.innerHTML = guestbook.map((g, idx) => `
+                <div class="bg-gray-900 p-3 rounded-xl border border-gray-700 flex justify-between items-center text-sm">
+                    <div><strong>${g.name}</strong>: ${g.message}</div>
+                    <button onclick="deleteGuestbook(${idx})" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs">Smazat</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteGuestbook(idx) {
+            guestbook.splice(idx, 1);
+            localStorage.setItem('ch_guestbook', JSON.stringify(guestbook));
+            renderAdminGuestbook();
+        }
+    </script>
+</body>
+</html>
