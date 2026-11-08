@@ -1,5 +1,3 @@
-Tady je opravená verze souboru index.html, kde jsem počítadlo návštěv přesunul dolů přímo do patičky stránky a zajistil, aby správně a reálně počítalo každé otevření webu (s výchozí hodnotou a inkrementací při každém načtení).
-Soubor pro veřejný web: index.html
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -38,12 +36,12 @@ Soubor pro veřejný web: index.html
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- REKLAMNÍ BANNER (Bez počítadla nahoře) -->
+    <!-- REKLAMNÍ BANNER -->
     <div class="bg-navyDark text-white text-center py-2 px-3 text-[11px] tracking-wider uppercase border-b border-gray-800">
         <span id="ad-banner-slot">✨ Reklama: Získej exkluzivní prémiový přístup! <a href="#" class="underline text-brandCyan ml-2">Zjistit více</a></span>
     </div>
 
-    <!-- HORNÍ NAVIGACE -->
+    <!-- HORNÍ NAVIGACE (Včetně nové záložky Odkazy) -->
     <header class="bg-navyDark text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('home')">
@@ -54,6 +52,7 @@ Soubor pro veřejný web: index.html
                 <button onclick="switchTab('home')" id="tab-btn-home" class="px-2.5 py-1.5 rounded-lg transition text-brandCyan font-semibold bg-white/15 whitespace-nowrap">Úvod</button>
                 <button onclick="switchTab('profiles')" id="tab-btn-profiles" class="px-2.5 py-1.5 rounded-lg transition hover:bg-white/10 text-gray-300 whitespace-nowrap">Profily</button>
                 <button onclick="switchTab('articles')" id="tab-btn-articles" class="px-2.5 py-1.5 rounded-lg transition hover:bg-white/10 text-gray-300 whitespace-nowrap">Články</button>
+                <button onclick="switchTab('links')" id="tab-btn-links" class="px-2.5 py-1.5 rounded-lg transition hover:bg-white/10 text-gray-300 whitespace-nowrap">Odkazy</button>
                 <button onclick="switchTab('guestbook')" id="tab-btn-guestbook" class="px-2.5 py-1.5 rounded-lg transition hover:bg-white/10 text-gray-300 whitespace-nowrap">Vzkazy</button>
             </nav>
         </div>
@@ -138,6 +137,14 @@ Soubor pro veřejný web: index.html
             <div id="articles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </div>
 
+        <!-- TAB: ODKAZY (Záložka s externími weby a bannery) -->
+        <div id="tab-links" class="tab-content hidden">
+            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-4">Doporučené odkazy a partnerské weby</h2>
+            <div id="links-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Vykresleno dynamicky z localStorage -->
+            </div>
+        </div>
+
         <!-- TAB: KNIHA NÁVŠTĚV -->
         <div id="tab-guestbook" class="tab-content hidden">
             <div class="max-w-xl mx-auto bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-gray-100">
@@ -153,7 +160,7 @@ Soubor pro veřejný web: index.html
 
     </main>
 
-    <!-- MODAL DETAIL S BIO, GALERIÍ A SDÍLENÍm -->
+    <!-- MODAL DETAIL -->
     <div id="profile-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
         <div class="bg-white rounded-3xl max-w-xl w-full p-5 relative shadow-2xl overflow-y-auto max-h-[90vh]">
             <button onclick="closeModal()" class="absolute top-4 right-4 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center font-bold">✕</button>
@@ -161,13 +168,13 @@ Soubor pro veřejný web: index.html
         </div>
     </div>
 
-    <!-- LIGHTBOX PRO ZOBRAZENÍ FOTKY PŘES CELOU OBRAZOVKU -->
+    <!-- LIGHTBOX -->
     <div id="lightbox-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-2" onclick="closeLightbox()">
         <button class="absolute top-5 right-5 text-white text-3xl font-bold">&times;</button>
         <img id="lightbox-img" src="" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl">
     </div>
 
-    <!-- PATIČKA S REÁLNÝM POČÍTADLEM NÁVŠTĚV -->
+    <!-- PATIČKA -->
     <footer class="bg-white border-t py-6 mt-12 text-center text-xs text-gray-500 space-y-2">
         <p>ČESKÉ HOLKY • Všechna práva vyhrazena © 2026</p>
         <p class="text-[11px] text-gray-400">👁️ Celkem zobrazení webu: <strong id="site-visitor-counter" class="text-brandBlue font-bold">0</strong></p>
@@ -182,24 +189,27 @@ Soubor pro veřejný web: index.html
             { title: "Historie a vývoj české adult produkce", date: "1. 11. 2026", content: "Jak se české herečky prosadily na světové scéně." }
         ];
 
+        let defaultLinks = [
+            { title: "Partnerský web", url: "https://example.com", banner: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80", description: "Navštivte naše partnerské stránky plné skvělého obsahu." }
+        ];
+
         let defaultGuestbook = [
             { name: "Petr", message: "Skvělý portál!", date: "7. 11. 2026" }
         ];
 
         let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || defaultProfiles;
         let articles = JSON.parse(localStorage.getItem('ch_articles')) || defaultArticles;
+        let externalLinks = JSON.parse(localStorage.getItem('ch_links')) || defaultLinks;
         let guestbook = JSON.parse(localStorage.getItem('ch_guestbook')) || defaultGuestbook;
         let favorites = JSON.parse(localStorage.getItem('ch_favorites')) || [];
         let adCode = localStorage.getItem('ch_adcode') || '';
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Reálné počítadlo návštěv v patičce
             let views = parseInt(localStorage.getItem('ch_site_views') || '0');
             views++;
             localStorage.setItem('ch_site_views', views);
             document.getElementById('site-visitor-counter').innerText = views.toLocaleString();
 
-            // Pokud existuje požadavek na sdílený profil v URL
             const urlParams = new URLSearchParams(window.location.search);
             const profileId = urlParams.get('profile');
             if (profileId) {
@@ -208,6 +218,7 @@ Soubor pro veřejný web: index.html
 
             filterAndRenderProfiles();
             renderArticles();
+            renderLinks();
             renderGuestbook();
             if(adCode) document.getElementById('ad-banner-slot').innerHTML = adCode;
         });
@@ -216,7 +227,7 @@ Soubor pro veřejný web: index.html
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
             
-            ['home', 'profiles', 'articles', 'guestbook'].forEach(t => {
+            ['home', 'profiles', 'articles', 'links', 'guestbook'].forEach(t => {
                 const btn = document.getElementById('tab-btn-' + t);
                 if(btn) {
                     if(t === tabId) {
@@ -379,6 +390,24 @@ Soubor pro veřejný web: index.html
             `).join('');
         }
 
+        function renderLinks() {
+            const grid = document.getElementById('links-grid');
+            if(!externalLinks || externalLinks.length === 0) {
+                grid.innerHTML = '<p class="text-xs text-gray-500 col-span-full text-center">Zatím žádné odkazy.</p>';
+                return;
+            }
+            grid.innerHTML = externalLinks.map(l => `
+                <a href="${l.url}" target="_blank" class="bg-white rounded-3xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col group">
+                    <div class="w-full h-40 rounded-2xl overflow-hidden mb-3 bg-gray-100">
+                        <img src="${l.banner}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                    </div>
+                    <h3 class="font-bold text-base text-gray-900 mb-1 group-hover:text-brandBlue transition">${l.title}</h3>
+                    <p class="text-xs text-gray-600 mb-4">${l.description || ''}</p>
+                    <span class="mt-auto text-xs font-bold text-brandBlue underline">Navštívit web →</span>
+                </a>
+            `).join('');
+        }
+
         function renderGuestbook() {
             document.getElementById('guestbook-list').innerHTML = guestbook.map(g => `
                 <div class="bg-gray-50 p-3 rounded-2xl border text-xs">
@@ -403,4 +432,3 @@ Soubor pro veřejný web: index.html
     </script>
 </body>
 </html>
-
