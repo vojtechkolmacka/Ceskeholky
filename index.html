@@ -28,40 +28,27 @@
         body { overflow-x: hidden; }
         .profile-card { transition: all 0.3s ease; }
         .profile-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
-        .banner-pc {
-            width: 100%;
-            max-height: 340px;
-            object-fit: cover;
-            object-position: center;
-        }
-        .banner-mobil {
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-            background-color: #0b1329;
-            display: block;
-        }
+        .banner-pc { width: 100%; max-height: 340px; object-fit: cover; object-position: center; }
+        .banner-mobil { width: 100%; height: auto; object-fit: contain; background-color: #0b1329; display: block; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- REKLAMNÍ / OZNÁMENÍ BANNER (Ovládaný z administrace) -->
+    <!-- REKLAMNÍ BANNER -->
     <div id="ad-banner-slot" class="bg-navyDark text-white text-center py-2 px-3 text-[11px] tracking-wider uppercase border-b border-gray-800">
         ✨ Reklama: Získej exkluzivní prémiový přístup! <a href="#" class="underline text-brandCyan ml-2">Zjistit více</a>
     </div>
 
-    <!-- HORNÍ NAVIGACE (Čistě pro návštěvníky, žádný odkaz na admin) -->
+    <!-- HORNÍ NAVIGACE (Záložky) -->
     <header class="bg-navyDark text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            
-            <!-- Logo vlevo -->
             <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('home')">
                 <span class="text-base sm:text-xl font-extrabold tracking-wide text-white">ČESKÉ <span class="text-brandCyan">HOLKY</span></span>
             </div>
 
-            <!-- Standardní textové záložky (Bezpečně bez odkazu na administraci) -->
+            <!-- Funkční textové záložky -->
             <nav class="flex items-center space-x-1 sm:space-x-3 text-xs sm:text-sm font-medium overflow-x-auto py-2">
-                <button onclick="switchTab('home')" id="tab-btn-home" class="px-2.5 py-1.5 rounded-lg transition text-brandCyan font-semibold bg-white/10 whitespace-nowrap">Úvod</button>
+                <button onclick="switchTab('home')" id="tab-btn-home" class="px-2.5 py-1.5 rounded-lg transition text-brandCyan font-semibold bg-white/15 whitespace-nowrap">Úvod</button>
                 <button onclick="switchTab('profiles')" id="tab-btn-profiles" class="px-2.5 py-1.5 rounded-lg transition hover:bg-white/10 text-gray-300 whitespace-nowrap">Profily</button>
                 <button onclick="switchTab('articles')" id="tab-btn-articles" class="px-2.5 py-1.5 rounded-lg transition hover:bg-white/10 text-gray-300 whitespace-nowrap">Články</button>
                 <button onclick="switchTab('guestbook')" id="tab-btn-guestbook" class="px-2.5 py-1.5 rounded-lg transition hover:bg-white/10 text-gray-300 whitespace-nowrap">Vzkazy</button>
@@ -69,57 +56,48 @@
         </div>
     </header>
 
-    <!-- ================= PŘESNÉ BANNERY (PC / MOBIL) ================= -->
-    <!-- DESKTOP BANNER (banner-pc.jpg) -->
+    <!-- BANNERY -->
     <div class="hidden md:block w-full bg-navyDark shadow-lg overflow-hidden">
         <div class="max-w-7xl mx-auto flex justify-center">
-            <img src="banner-pc.jpg" alt="České Holky Desktop Banner" class="banner-pc">
+            <img src="banner-pc.jpg" alt="Desktop Banner" class="banner-pc">
         </div>
     </div>
-
-    <!-- MOBILNÍ BANNER (banner-mobil.jpg - s viditelným nadpisem nahoře) -->
     <div class="block md:hidden w-full bg-navyDark shadow-md overflow-hidden">
-        <img src="banner-mobil.jpg" alt="České Holky Mobilní Banner" class="banner-mobil">
+        <img src="banner-mobil.jpg" alt="Mobil Banner" class="banner-mobil">
     </div>
 
-    <!-- ================= HLAVNÍ OBSAH ================= -->
+    <!-- HLAVNÍ OBSAH -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5">
 
-        <!-- TAB: ÚVOD & PROFILY -->
+        <!-- TAB: ÚVOD -->
         <div id="tab-home" class="tab-content">
-            
-            <!-- PŘEHLEDNÉ FILTRY BEZ CHYB V OKRAJÍCH -->
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                    
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Jméno</label>
                         <input type="text" id="search-input" oninput="filterAndRenderProfiles()" placeholder="Hledat jméno..." class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-brandBlue bg-gray-50/50">
                     </div>
-
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Barva vlasů</label>
-                        <select id="filter-hair" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50 focus:ring-2 focus:ring-brandBlue">
+                        <select id="filter-hair" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
                             <option value="">Všechny</option>
                             <option value="blonde">Blond</option>
                             <option value="brunette">Brunetka</option>
                             <option value="redhead">Zrzka</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Věk</label>
-                        <select id="filter-age" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50 focus:ring-2 focus:ring-brandBlue">
+                        <select id="filter-age" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
                             <option value="">Všechny věkové kategorie</option>
                             <option value="18-25">18–25 let</option>
                             <option value="26-30">26–30 let</option>
                             <option value="31+">31+ let</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Lokalita a řazení</label>
-                        <select id="filter-sort" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50 focus:ring-2 focus:ring-brandBlue">
+                        <select id="filter-sort" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
                             <option value="newest">Řadit: Od nejnovějších</option>
                             <option value="name">Řadit: Abecedně (A-Z)</option>
                             <option value="age-asc">Řadit: Od nejmladších</option>
@@ -127,8 +105,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- PROFILOVÉ KARTY -->
             <div id="profiles-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
         </div>
 
@@ -170,12 +146,10 @@
         </div>
     </div>
 
-    <!-- Patička -->
     <footer class="bg-white border-t py-6 mt-12 text-center text-xs text-gray-500">
         ČESKÉ HOLKY • Všechna práva vyhrazena © 2026
     </footer>
 
-    <!-- JAVASCRIPT -->
     <script>
         let defaultProfiles = [
             { id: 1, name: "ZAMBLI", age: 27, location: "Praha", photosCount: 12, hair: "brunette", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", bio: "Populární česká herečka a modelka s množstvím ocenění." },
@@ -233,22 +207,16 @@
             let filtered = profiles.filter(p => {
                 const matchSearch = p.name.toLowerCase().includes(search);
                 const matchHair = !hair || p.hair === hair;
-                
                 let matchAge = true;
                 if (ageGroup === '18-25') matchAge = p.age >= 18 && p.age <= 25;
                 if (ageGroup === '26-30') matchAge = p.age >= 26 && p.age <= 30;
                 if (ageGroup === '31+') matchAge = p.age >= 31;
-
                 return matchSearch && matchHair && matchAge;
             });
 
-            if (sortBy === 'name') {
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
-            } else if (sortBy === 'age-asc') {
-                filtered.sort((a, b) => a.age - b.age);
-            } else {
-                filtered.reverse();
-            }
+            if (sortBy === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+            else if (sortBy === 'age-asc') filtered.sort((a, b) => a.age - b.age);
+            else filtered.reverse();
 
             document.getElementById('profiles-grid').innerHTML = filtered.map(p => createCard(p)).join('');
         }
@@ -303,16 +271,12 @@
             document.getElementById('profile-modal').classList.add('hidden');
         }
 
-        def renderArticles() {
-            // opraveno
-        }
-
         function renderArticles() {
             document.getElementById('articles-grid').innerHTML = articles.map(a => `
                 <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
                     <span class="text-[10px] font-semibold text-brandCyan bg-navyDark px-2 py-0.5 rounded-full">${a.date}</span>
                     <h3 class="text-sm font-bold mt-2 mb-1">${a.title}</h3>
-                    <div class="text-xs text-gray-600">${a.content}</div>
+                    <div class="text-xs text-gray-600 space-y-2 mt-2">${a.content}</div>
                 </div>
             `).join('');
         }
