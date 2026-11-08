@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>České Holky – Portál a databáze profilů</title>
+    <!-- SEO optimalizace -->
+    <title>České Holky – Exkluzivní portál a databáze profilů</title>
+    <meta name="description" content="Objevte ty nejkrásnější české tváře, detailní biografie, exkluzivní fotogalerie a články ze světa adult produkce.">
     <!-- Google Fonts & Tailwind CSS -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,12 +36,13 @@
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans antialiased">
 
-    <!-- REKLAMNÍ BANNER -->
-    <div id="ad-banner-slot" class="bg-navyDark text-white text-center py-2 px-3 text-[11px] tracking-wider uppercase border-b border-gray-800">
-        ✨ Reklama: Získej exkluzivní prémiový přístup! <a href="#" class="underline text-brandCyan ml-2">Zjistit více</a>
+    <!-- REKLAMNÍ BANNER A POČÍTADLO NÁVŠTĚV -->
+    <div class="bg-navyDark text-white text-center py-2 px-3 text-[11px] tracking-wider uppercase border-b border-gray-800 flex flex-col sm:flex-row justify-center items-center gap-2">
+        <span id="ad-banner-slot">✨ Reklama: Získej exkluzivní prémiový přístup! <a href="#" class="underline text-brandCyan ml-2">Zjistit více</a></span>
+        <span class="bg-white/10 px-2 py-0.5 rounded-full text-[10px] text-brandCyan">👁️ Celkem zobrazení webu: <strong id="site-visitor-counter">1</strong></span>
     </div>
 
-    <!-- HORNÍ NAVIGACE (Záložky) -->
+    <!-- HORNÍ NAVIGACE -->
     <header class="bg-navyDark text-white sticky top-0 z-50 shadow-md">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('home')">
@@ -55,31 +58,27 @@
         </div>
     </header>
 
-    <!-- BANNERY -->
+    <!-- OPTIMALIZOVANÉ BANNERY PRO PC A MOBIL -->
     <div class="hidden md:block w-full bg-navyDark shadow-lg overflow-hidden">
         <div class="max-w-7xl mx-auto flex justify-center">
-            <img src="banner-pc.jpg" alt="Desktop Banner" class="banner-pc">
+            <img src="banner-pc.jpg" alt="České Holky Desktop Banner" class="banner-pc">
         </div>
     </div>
     <div class="block md:hidden w-full bg-navyDark shadow-md overflow-hidden">
-        <img src="banner-mobil.jpg" alt="Mobil Banner" class="banner-mobil">
+        <img src="banner-mobil.jpg" alt="České Holky Mobilní Banner" class="banner-mobil">
     </div>
 
     <!-- HLAVNÍ OBSAH -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5">
 
-        <!-- TAB: ÚVOD S PROŠÍŘENÝMI FILTRY -->
+        <!-- TAB: ÚVOD S ŽIVÝM FILTROVÁNÍM -->
         <div id="tab-home" class="tab-content">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-                    
-                    <!-- 1. Jméno -->
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Jméno</label>
                         <input type="text" id="search-input" oninput="filterAndRenderProfiles()" placeholder="Hledat jméno..." class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-brandBlue bg-gray-50/50">
                     </div>
-
-                    <!-- 2. Barva vlasů -->
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Barva vlasů</label>
                         <select id="filter-hair" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
@@ -89,8 +88,6 @@
                             <option value="redhead">Zrzka</option>
                         </select>
                     </div>
-
-                    <!-- 3. Věk -->
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Věk</label>
                         <select id="filter-age" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
@@ -101,8 +98,6 @@
                             <option value="31+">31+ let</option>
                         </select>
                     </div>
-
-                    <!-- 4. Lokalita -->
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Lokalita</label>
                         <select id="filter-location" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
@@ -111,11 +106,8 @@
                             <option value="Brno">Brno</option>
                             <option value="Ostrava">Ostrava</option>
                             <option value="Zlín">Zlín</option>
-                            <option value="Plzeň">Plzeň</option>
                         </select>
                     </div>
-
-                    <!-- 5. Řazení -->
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Řazení</label>
                         <select id="filter-sort" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
@@ -124,7 +116,6 @@
                             <option value="age-asc">Od nejmladších</option>
                         </select>
                     </div>
-
                 </div>
             </div>
 
@@ -161,12 +152,18 @@
 
     </main>
 
-    <!-- MODAL DETAIL S BIO A GALERIÍ -->
+    <!-- MODAL DETAIL S BIO, GALERIÍ A SDÍLENÍm -->
     <div id="profile-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
         <div class="bg-white rounded-3xl max-w-xl w-full p-5 relative shadow-2xl overflow-y-auto max-h-[90vh]">
             <button onclick="closeModal()" class="absolute top-4 right-4 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center font-bold">✕</button>
             <div id="modal-content"></div>
         </div>
+    </div>
+
+    <!-- LIGHTBOX PRO ZOBRAZENÍ FOTKY PŘES CELOU OBRAZOVKU -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-2" onclick="closeLightbox()">
+        <button class="absolute top-5 right-5 text-white text-3xl font-bold">&times;</button>
+        <img id="lightbox-img" src="" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl">
     </div>
 
     <footer class="bg-white border-t py-6 mt-12 text-center text-xs text-gray-500">
@@ -175,7 +172,7 @@
 
     <script>
         let defaultProfiles = [
-            { id: 1, name: "ZAMBLI", age: 27, location: "Praha", gallery: ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"], hair: "brunette", bio: "Populární česká herečka a modelka s množstvím ocenění." }
+            { id: 1, name: "ZAMBLI", age: 27, location: "Praha", createdAt: Date.now() - 86400000, gallery: ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80"], hair: "brunette", bio: "Populární česká herečka a modelka s množstvím ocenění." }
         ];
 
         let defaultArticles = [
@@ -193,6 +190,19 @@
         let adCode = localStorage.getItem('ch_adcode') || '';
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Počítadlo návštěv
+            let views = parseInt(localStorage.getItem('ch_site_views') || '142850');
+            views++;
+            localStorage.setItem('ch_site_views', views);
+            document.getElementById('site-visitor-counter').innerText = views.toLocaleString();
+
+            // Pokud existuje požadavek na sdílený profil v URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const profileId = urlParams.get('profile');
+            if (profileId) {
+                openDetail(parseInt(profileId));
+            }
+
             filterAndRenderProfiles();
             renderArticles();
             renderGuestbook();
@@ -241,7 +251,7 @@
 
             if (sortBy === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
             else if (sortBy === 'age-asc') filtered.sort((a, b) => a.age - b.age);
-            else filtered.reverse();
+            else filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
             document.getElementById('profiles-grid').innerHTML = filtered.map(p => createCard(p)).join('');
         }
@@ -255,9 +265,13 @@
             const isFav = favorites.includes(p.id);
             const totalPhotos = p.gallery ? p.gallery.length : (p.image ? 1 : 0);
             const coverImg = p.gallery && p.gallery.length > 0 ? p.gallery[0] : p.image;
+            
+            // Kontrola zda je profil novinka (mladší než 7 dní)
+            const isNew = p.createdAt && (Date.now() - p.createdAt < 7 * 24 * 60 * 60 * 1000);
 
             return `
                 <div class="profile-card bg-white rounded-3xl p-4 border border-gray-100 shadow-sm relative flex flex-col">
+                    ${isNew ? '<span class="absolute top-4 left-4 z-10 bg-brandPink text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow">NOVINKA</span>' : ''}
                     <button onclick="toggleFav(${p.id})" class="absolute top-5 right-5 z-10 bg-white/90 p-2 rounded-full shadow hover:scale-110 transition">
                         ${isFav ? '❤️' : '🤍'}
                     </button>
@@ -286,8 +300,13 @@
             document.getElementById('modal-content').innerHTML = `
                 <div class="flex flex-col items-center">
                     <h2 class="text-xl font-extrabold mb-1">${p.name}</h2>
-                    <p class="text-xs text-gray-500 mb-4">📍 ${p.location || 'ČR'} | 🎂 ${p.age} let | 📷 ${galleryArray.length} fotek</p>
+                    <p class="text-xs text-gray-500 mb-3">📍 ${p.location || 'ČR'} | 🎂 ${p.age} let | 📷 ${galleryArray.length} fotek</p>
                     
+                    <!-- Tlačítko pro sdílení odkazu -->
+                    <button onclick="shareProfile(${p.id})" class="mb-4 bg-brandBlue/10 text-brandBlue hover:bg-brandBlue/20 px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center space-x-1">
+                        <span>🔗 Sdílet tento profil</span>
+                    </button>
+
                     <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full mb-4">
                         <button onclick="switchModalTab('bio')" id="modal-tab-bio" class="flex-1 py-2 text-xs font-bold rounded-lg bg-navyDark text-white transition">📖 Bio</button>
                         <button onclick="switchModalTab('gallery')" id="modal-tab-gallery" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 hover:bg-gray-200 transition">🖼️ Galerie (${galleryArray.length})</button>
@@ -299,7 +318,7 @@
 
                     <div id="modal-content-gallery" class="w-full hidden space-y-3 max-h-72 overflow-y-auto pr-1">
                         <div class="grid grid-cols-2 gap-2">
-                            ${galleryArray.map(img => `<div class="h-36 rounded-xl overflow-hidden bg-gray-100 shadow-sm"><img src="${img}" class="w-full h-full object-cover"></div>`).join('')}
+                            ${galleryArray.map(img => `<div class="h-36 rounded-xl overflow-hidden bg-gray-100 shadow-sm cursor-pointer" onclick="openLightbox('${img}')"><img src="${img}" class="w-full h-full object-cover"></div>`).join('')}
                         </div>
                     </div>
 
@@ -307,6 +326,24 @@
                 </div>
             `;
             document.getElementById('profile-modal').classList.remove('hidden');
+        }
+
+        function shareProfile(id) {
+            const shareUrl = window.location.origin + window.location.pathname + '?profile=' + id;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                alert('Odkaz na profil byl zkopírován do schránky!');
+            }).catch(() => {
+                prompt('Zkopírujte tento odkaz:', shareUrl);
+            });
+        }
+
+        function openLightbox(imgSrc) {
+            document.getElementById('lightbox-img').src = imgSrc;
+            document.getElementById('lightbox-modal').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
         }
 
         function switchModalTab(tab) {
