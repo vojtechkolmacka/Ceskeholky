@@ -68,42 +68,66 @@
     <!-- HLAVNÍ OBSAH -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5">
 
-        <!-- TAB: ÚVOD -->
+        <!-- TAB: ÚVOD S PROŠÍŘENÝMI FILTRY -->
         <div id="tab-home" class="tab-content">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+                    
+                    <!-- 1. Jméno -->
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Jméno</label>
                         <input type="text" id="search-input" oninput="filterAndRenderProfiles()" placeholder="Hledat jméno..." class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-brandBlue bg-gray-50/50">
                     </div>
+
+                    <!-- 2. Barva vlasů -->
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Barva vlasů</label>
                         <select id="filter-hair" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
-                            <option value="">Všechny</option>
+                            <option value="">Všechny barvy</option>
                             <option value="blonde">Blond</option>
                             <option value="brunette">Brunetka</option>
                             <option value="redhead">Zrzka</option>
                         </select>
                     </div>
+
+                    <!-- 3. Věk -->
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Věk</label>
                         <select id="filter-age" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
-                            <option value="">Všechny věkové kategorie</option>
-                            <option value="18-25">18–25 let</option>
-                            <option value="26-30">26–30 let</option>
+                            <option value="">Všechny věky</option>
+                            <option value="18-22">18–22 let</option>
+                            <option value="23-26">23–26 let</option>
+                            <option value="27-30">27–30 let</option>
                             <option value="31+">31+ let</option>
                         </select>
                     </div>
+
+                    <!-- 4. Lokalita -->
                     <div>
-                        <label class="block text-[11px] font-semibold text-gray-500 mb-1">Lokalita a řazení</label>
-                        <select id="filter-sort" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
-                            <option value="newest">Řadit: Od nejnovějších</option>
-                            <option value="name">Řadit: Abecedně (A-Z)</option>
-                            <option value="age-asc">Řadit: Od nejmladších</option>
+                        <label class="block text-[11px] font-semibold text-gray-500 mb-1">Lokalita</label>
+                        <select id="filter-location" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
+                            <option value="">Všechny lokality</option>
+                            <option value="Praha">Praha</option>
+                            <option value="Brno">Brno</option>
+                            <option value="Ostrava">Ostrava</option>
+                            <option value="Zlín">Zlín</option>
+                            <option value="Plzeň">Plzeň</option>
                         </select>
                     </div>
+
+                    <!-- 5. Řazení -->
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-500 mb-1">Řazení</label>
+                        <select id="filter-sort" onchange="filterAndRenderProfiles()" class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs bg-gray-50/50">
+                            <option value="newest">Od nejnovějších</option>
+                            <option value="name">Abecedně (A-Z)</option>
+                            <option value="age-asc">Od nejmladších</option>
+                        </select>
+                    </div>
+
                 </div>
             </div>
+
             <div id="profiles-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
         </div>
 
@@ -137,7 +161,7 @@
 
     </main>
 
-    <!-- MODAL DETAIL S KATEGORIEMI BIO A GALERIE -->
+    <!-- MODAL DETAIL S BIO A GALERIÍ -->
     <div id="profile-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
         <div class="bg-white rounded-3xl max-w-xl w-full p-5 relative shadow-2xl overflow-y-auto max-h-[90vh]">
             <button onclick="closeModal()" class="absolute top-4 right-4 bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center font-bold">✕</button>
@@ -198,16 +222,21 @@
             const search = document.getElementById('search-input').value.toLowerCase();
             const hair = document.getElementById('filter-hair').value;
             const ageGroup = document.getElementById('filter-age').value;
+            const location = document.getElementById('filter-location').value;
             const sortBy = document.getElementById('filter-sort').value;
 
             let filtered = profiles.filter(p => {
                 const matchSearch = p.name.toLowerCase().includes(search);
                 const matchHair = !hair || p.hair === hair;
+                const matchLoc = !location || (p.location && p.location.toLowerCase() === location.toLowerCase());
+                
                 let matchAge = true;
-                if (ageGroup === '18-25') matchAge = p.age >= 18 && p.age <= 25;
-                if (ageGroup === '26-30') matchAge = p.age >= 26 && p.age <= 30;
+                if (ageGroup === '18-22') matchAge = p.age >= 18 && p.age <= 22;
+                if (ageGroup === '23-26') matchAge = p.age >= 23 && p.age <= 26;
+                if (ageGroup === '27-30') matchAge = p.age >= 27 && p.age <= 30;
                 if (ageGroup === '31+') matchAge = p.age >= 31;
-                return matchSearch && matchHair && matchAge;
+
+                return matchSearch && matchHair && matchLoc && matchAge;
             });
 
             if (sortBy === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
@@ -249,7 +278,6 @@
             filterAndRenderProfiles();
         }
 
-        // OTEVŘENÍ DETAILU S KATEGORIEMI BIO A GALERIE
         function openDetail(id) {
             const p = profiles.find(x => x.id === id);
             if(!p) return;
@@ -260,18 +288,15 @@
                     <h2 class="text-xl font-extrabold mb-1">${p.name}</h2>
                     <p class="text-xs text-gray-500 mb-4">📍 ${p.location || 'ČR'} | 🎂 ${p.age} let | 📷 ${galleryArray.length} fotek</p>
                     
-                    <!-- Přepínací tlačítka kategorií (Bio / Galerie) -->
                     <div class="flex space-x-2 bg-gray-100 p-1 rounded-xl w-full mb-4">
                         <button onclick="switchModalTab('bio')" id="modal-tab-bio" class="flex-1 py-2 text-xs font-bold rounded-lg bg-navyDark text-white transition">📖 Bio</button>
                         <button onclick="switchModalTab('gallery')" id="modal-tab-gallery" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 hover:bg-gray-200 transition">🖼️ Galerie (${galleryArray.length})</button>
                     </div>
 
-                    <!-- Obsah záložky BIO -->
                     <div id="modal-content-bio" class="w-full text-xs text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-2xl border mb-4">
                         ${p.bio || 'Žádný životopis není k dispozici.'}
                     </div>
 
-                    <!-- Obsah záložky GALERIE (skryto ve výchozím stavu) -->
                     <div id="modal-content-gallery" class="w-full hidden space-y-3 max-h-72 overflow-y-auto pr-1">
                         <div class="grid grid-cols-2 gap-2">
                             ${galleryArray.map(img => `<div class="h-36 rounded-xl overflow-hidden bg-gray-100 shadow-sm"><img src="${img}" class="w-full h-full object-cover"></div>`).join('')}
