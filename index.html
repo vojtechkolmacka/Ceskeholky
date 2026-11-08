@@ -26,6 +26,19 @@
     <style>
         .profile-card { transition: all 0.3s ease; }
         .profile-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
+        /* Vynucení správného poměru stran a zamezení ořezávání bannerů */
+        .banner-pc {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            object-position: center;
+        }
+        .banner-mobil {
+            width: 100%;
+            max-height: 480px;
+            object-fit: contain;
+            background-color: #0b1329;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans antialiased">
@@ -86,18 +99,18 @@
         </div>
     </header>
 
-    <!-- ================= LOKÁLNÍ OBRÁZKY BANNERŮ (Nahraj soubory banner-pc.jpg a banner-mobil.jpg do stejné složky na GitHubu) ================= -->
+    <!-- ================= DOKONALE PŘIZPŮSOBENÉ BANNERY PRO PC A MOBIL ================= -->
     
-    <!-- DESKTOP BANNER -->
+    <!-- DESKTOP BANNER (Zobrazeno na PC a tabletech) -->
     <div class="hidden md:block w-full bg-navyDark shadow-2xl relative overflow-hidden">
-        <div class="max-w-7xl mx-auto">
-            <img src="banner-pc.jpg" alt="České Holky Desktop Banner" class="w-full h-auto object-cover max-h-[360px]">
+        <div class="max-w-7xl mx-auto flex justify-center">
+            <img src="banner-pc.jpg" alt="České Holky Desktop Banner" class="banner-pc">
         </div>
     </div>
 
-    <!-- MOBILNÍ BANNER -->
-    <div class="block md:hidden w-full bg-navyDark shadow-xl relative overflow-hidden">
-        <img src="banner-mobil.jpg" alt="České Holky Mobilní Banner" class="w-full h-auto object-cover">
+    <!-- MOBILNÍ BANNER (Zobrazeno na mobilech - zachovává celý poměr stran bez ořezu) -->
+    <div class="block md:hidden w-full bg-navyDark shadow-xl relative overflow-hidden flex justify-center">
+        <img src="banner-mobil.jpg" alt="České Holky Mobilní Banner" class="banner-mobil">
     </div>
 
     <!-- ================= HLAVNÍ OBSAHOVÁ ČÁST ================= -->
