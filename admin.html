@@ -20,24 +20,23 @@
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans p-4 sm:p-8">
 
     <div class="max-w-4xl mx-auto">
-        <!-- Hlavička adminu -->
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
                 <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Nezávislá správa profilů, článků a reklamy</p>
+                <p class="text-xs text-gray-400 mt-0.5">Soukromá správa profilů a článků</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
 
         <div class="space-y-6">
-            <!-- Placená reklama -->
+            <!-- Reklama -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-2">📢 Kód pro placenou reklamu</h2>
                 <textarea id="admin-ad-code" rows="2" class="w-full p-3 text-xs font-mono rounded-xl bg-gray-900 border border-gray-700 text-white mb-3" placeholder="<script>...</script>"></textarea>
                 <button onclick="saveAdCode()" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold">Uložit reklamu</button>
             </div>
 
-            <!-- Přidat holku -->
+            <!-- Přidat profil -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">➕ Přidat nový profil herečky</h2>
                 <form onsubmit="addNewProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -50,7 +49,7 @@
                         <option value="redhead">Zrzka</option>
                     </select>
                     <div class="sm:col-span-2">
-                        <label class="block text-[11px] text-gray-400 mb-1">Vybrat fotku z mobilu / PC:</label>
+                        <label class="block text-[11px] text-gray-400 mb-1">Vybrat profilovou fotku:</label>
                         <input type="file" id="p-image-file" accept="image/*" class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
                     </div>
                     <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs" rows="2"></textarea>
@@ -58,20 +57,34 @@
                 </form>
             </div>
 
-            <!-- Přidat článek s podporou HTML, obrázků a odkazů -->
+            <!-- Přidat článek s možností přidat fotku a odkaz -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
-                <h2 class="text-base font-bold mb-3">📑 Přidat nový článek</h2>
+                <h2 class="text-base font-bold mb-3">📑 Přidat nový článek s fotkou a odkazem</h2>
                 <form onsubmit="addNewArticle(event)" class="space-y-3">
                     <input type="text" id="a-title" placeholder="Nadpis článku" required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs">
+                    
                     <div>
-                        <label class="block text-[11px] text-gray-400 mb-1">Obsah (můžete použít &lt;img src="..."&gt; nebo &lt;a href="..."&gt;):</label>
-                        <textarea id="a-content" placeholder="Napište text článku..." required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs" rows="3"></textarea>
+                        <label class="block text-[11px] text-gray-400 mb-1">Text článku:</label>
+                        <textarea id="a-text" placeholder="Napište text článku..." required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs" rows="3"></textarea>
                     </div>
-                    <button type="submit" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold">Publikovat článek</button>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1">Přiložit fotku do článku:</label>
+                            <input type="file" id="a-image-file" accept="image/*" class="w-full text-xs text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-gray-700 file:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-gray-400 mb-1">URL odkaz v článku (nepovinné):</label>
+                            <input type="url" id="a-link-url" placeholder="https://..." class="w-full p-2 rounded-xl bg-gray-900 border border-gray-700 text-xs">
+                            <input type="text" id="a-link-text" placeholder="Název odkazu (např. Více zde)" class="w-full p-2 rounded-xl bg-gray-900 border border-gray-700 text-xs mt-1">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="bg-brandBlue text-white px-4 py-2.5 rounded-xl text-xs font-semibold w-full mt-2">Publikovat článek</button>
                 </form>
             </div>
 
-            <!-- Seznam stávajících profilů -->
+            <!-- Správa profilů -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📋 Správa existujících profilů</h2>
                 <div id="admin-profiles-list" class="space-y-2"></div>
@@ -104,7 +117,7 @@
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                alert('Prosím vyberte obrázek.');
+                alert('Prosím vyberte profilovou fotku.');
             }
         }
 
@@ -127,13 +140,38 @@
 
         function addNewArticle(e) {
             e.preventDefault();
+            const title = document.getElementById('a-title').value;
+            const text = document.getElementById('a-text').value;
+            const linkUrl = document.getElementById('a-link-url').value;
+            const linkText = document.getElementById('a-link-text').value;
+            const imgFile = document.getElementById('a-image-file');
+
+            let contentHtml = `<p>${text.replace(/\n/g, '<br>')}</p>`;
+
+            if (linkUrl && linkText) {
+                contentHtml += `<p class="mt-2"><a href="${linkUrl}" target="_blank" class="text-brandBlue underline font-semibold">${linkText} →</a></p>`;
+            }
+
+            if (imgFile.files && imgFile.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    contentHtml += `<div class="mt-3"><img src="${event.target.result}" class="w-full rounded-2xl max-h-60 object-cover"></div>`;
+                    saveArticleFinal(title, contentHtml);
+                };
+                reader.readAsDataURL(imgFile.files[0]);
+            } else {
+                saveArticleFinal(title, contentHtml);
+            }
+        }
+
+        function saveArticleFinal(title, contentHtml) {
             articles.unshift({
-                title: document.getElementById('a-title').value,
+                title: title,
                 date: new Date().toLocaleDateString('cs-CZ'),
-                content: document.getElementById('a-content').value
+                content: contentHtml
             });
             localStorage.setItem('ch_articles', JSON.stringify(articles));
-            alert('Článek byl publikován!');
+            alert('Článek byl úspěšně publikován!');
             location.reload();
         }
 
