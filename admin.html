@@ -65,7 +65,7 @@
                 <div id="admin-links-list" class="space-y-2"></div>
             </div>
 
-            <!-- 2. PŘIDAT ČLÁNEK S TLAČÍTKY PRO FOTO A ODKAZ DO TEXTU -->
+            <!-- 2. PŘIDAT ČLÁNEK -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📑 Přidat nový článek</h2>
                 <form onsubmit="addNewArticle(event)" class="space-y-3">
@@ -90,7 +90,7 @@
                 <div id="admin-articles-list" class="space-y-2"></div>
             </div>
 
-            <!-- 3. PŘIDAT PROFIL -->
+            <!-- 3. PŘIDAT PROFIL (VČETNĚ GALERIE) -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">➕ Přidat nový profil herečky</h2>
                 <form onsubmit="addNewProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -104,8 +104,13 @@
                     </select>
 
                     <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
-                        <label class="block text-[11px] font-bold text-brandBlue mb-1">Hlavní profilový obrázek:</label>
+                        <label class="block text-[11px] font-bold text-brandBlue mb-1">Hlavní profilový obrázek (náhled na kartě):</label>
                         <input type="file" id="p-profile-img" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
+                    </div>
+
+                    <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
+                        <label class="block text-[11px] font-bold text-brandPink mb-1">Fotografie do galerie (můžete vybrat více fotek najednou z mobilu):</label>
+                        <input type="file" id="p-gallery-files" accept="image/*" multiple required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandPink file:text-white">
                     </div>
 
                     <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
@@ -155,7 +160,7 @@
                         description: document.getElementById('l-desc').value
                     });
                     localStorage.setItem('ch_links', JSON.stringify(externalLinks));
-                    alert('Odkaz s bannerem byl úspěšně přídán!');
+                    alert('Odkaz s bannerem byl úspěšně přidán!');
                     location.reload();
                 };
                 reader.readAsDataURL(fileInput.files[0]);
@@ -246,36 +251,54 @@
             }
         }
 
-        // PROFILY
+        // PROFILY (HLAVNÍ FOTKA + GALERIE)
         function addNewProfile(e) {
             e.preventDefault();
             const profileImgInput = document.getElementById('p-profile-img');
+            const galleryInput = document.getElementById('p-gallery-files');
 
             if (!profileImgInput.files || !profileImgInput.files[0]) {
                 alert('Vyberte hlavní profilový obrázek.');
                 return;
             }
+            if (!galleryInput.files || galleryInput.files.length === 0) {
+                alert('Vyberte alespoň jednu fotku do galerie.');
+                return;
+            }
 
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const newProfile = {
-                    id: Date.now(),
-                    name: document.getElementById('p-name').value.toUpperCase(),
-                    age: parseInt(document.getElementById('p-age').value),
-                    location: document.getElementById('p-location').value,
-                    hair: document.getElementById('p-hair').value,
-                    profileImage: event.target.result,
-                    gallery: [event.target.result],
-                    bio: document.getElementById('p-bio').value,
-                    createdAt: Date.now()
-                };
-
-                profiles.push(newProfile);
-                localStorage.setItem('ch_profiles', JSON.stringify(profiles));
-                alert('Profil byl úspěšně přidán!');
-                location.reload();
+            const profileReader = new FileReader();
+            profileReader.onload = function(profileEvent) {
+                const profileImgUrl = profileEvent.target.result;
+                
+                let galleryUrls = [];
+                let filesLoaded = 0;
+                
+                Array.from(galleryInput.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        galleryUrls[index] = event.target.result;
+                        filesLoaded++;
+                        if (filesLoaded === galleryInput.files.length) {
+                            profiles.push({
+                                id: Date.now(),
+                                name: document.getElementById('p-name').value.toUpperCase(),
+                                age: parseInt(document.getElementById('p-age').value),
+                                location: document.getElementById('p-location').value,
+                                hair: document.getElementById('p-hair').value,
+                                profileImage: profileImgUrl,
+                                gallery: galleryUrls,
+                                bio: document.getElementById('p-bio').value,
+                                createdAt: Date.now()
+                            });
+                            localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+                            alert('Profil a galerie byly úspěšně přidány!');
+                            location.reload();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
             };
-            reader.readAsDataURL(profileImgInput.files[0]);
+            profileReader.readAsDataURL(profileImgInput.files[0]);
         }
 
         function renderAdminProfiles() {
@@ -284,15 +307,19 @@
                 list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily v databázi.</p>';
                 return;
             }
-            list.innerHTML = profiles.map(p => `
-                <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
-                    <div class="flex items-center space-x-2">
-                        <img src="${p.profileImage}" class="w-8 h-8 rounded-lg object-cover">
-                        <span class="font-bold text-white">${p.name} (${p.age} let)</span>
+            list.innerHTML = profiles.map(p => {
+                const cover = p.profileImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
+                const count = p.gallery ? p.gallery.length : 0;
+                return `
+                    <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <img src="${cover}" class="w-8 h-8 rounded-lg object-cover">
+                            <span class="font-bold text-white">${p.name} (${count} fotek v galerii)</span>
+                        </div>
+                        <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
                     </div>
-                    <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function deleteProfile(id) {
