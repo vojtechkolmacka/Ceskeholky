@@ -23,57 +23,26 @@
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
                 <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Statistiky a správa obsahu</p>
+                <p class="text-xs text-gray-400 mt-0.5">Správa profilů a obsahu</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
 
         <div class="space-y-6">
             <!-- STATISTIKY -->
-            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700">
-                    <span class="block text-xl font-black text-brandBlue" id="stat-views">0</span>
-                    <span class="text-[10px] text-gray-400">Zobrazení</span>
-                </div>
+            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700 grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
                 <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700">
                     <span class="block text-xl font-black text-brandPink" id="stat-profiles">0</span>
-                    <span class="text-[10px] text-gray-400">Profily</span>
+                    <span class="text-[10px] text-gray-400">Aktivní profily</span>
                 </div>
                 <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700">
                     <span class="block text-xl font-black text-green-400" id="stat-articles">0</span>
                     <span class="text-[10px] text-gray-400">Články</span>
                 </div>
-                <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700">
+                <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700 col-span-2 sm:col-span-1">
                     <span class="block text-xl font-black text-yellow-400" id="stat-links">0</span>
                     <span class="text-[10px] text-gray-400">Odkazy</span>
                 </div>
-            </div>
-
-            <!-- PŘIDAT ODKAZ / BANNER -->
-            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
-                <h2 class="text-base font-bold mb-3">🔗 Přidat nový odkaz a banner</h2>
-                <form onsubmit="addNewLink(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input type="text" id="l-title" placeholder="Název odkazu / webu" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
-                    <input type="url" id="l-url" placeholder="URL adresa (https://...)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
-                    <div class="sm:col-span-2">
-                        <label class="block text-[11px] text-gray-400 mb-1">Nahrát banner z mobilu / PC:</label>
-                        <input type="file" id="l-banner-file" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
-                    </div>
-                    <textarea id="l-desc" placeholder="Krátký popis odkazu..." class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
-                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit odkaz s bannerem</button>
-                </form>
-            </div>
-
-            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
-                <h2 class="text-base font-bold mb-3">📋 Správa existujících odkazů</h2>
-                <div id="admin-links-list" class="space-y-2"></div>
-            </div>
-
-            <!-- REKLAMA -->
-            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
-                <h2 class="text-base font-bold mb-2">📢 Kód pro placenou reklamu</h2>
-                <textarea id="admin-ad-code" rows="2" class="w-full p-3 text-xs font-mono rounded-xl bg-gray-900 border border-gray-700 text-white mb-3" placeholder="<script>...</script>"></textarea>
-                <button onclick="saveAdCode()" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold">Uložit reklamu</button>
             </div>
 
             <!-- PŘIDAT PROFIL -->
@@ -90,13 +59,8 @@
                     </select>
 
                     <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
-                        <label class="block text-[11px] font-bold text-brandBlue mb-1">1. Hlavní profilový obrázek (náhled na kartě):</label>
+                        <label class="block text-[11px] font-bold text-brandBlue mb-1">Hlavní profilový obrázek:</label>
                         <input type="file" id="p-profile-img" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
-                    </div>
-
-                    <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
-                        <label class="block text-[11px] font-bold text-brandPink mb-1">2. Fotografie do galerie (můžete vybrat více fotek najednou):</label>
-                        <input type="file" id="p-gallery-files" accept="image/*" multiple required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandPink file:text-white">
                     </div>
 
                     <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
@@ -107,145 +71,61 @@
             <!-- SPRÁVA PROFILŮ -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📋 Správa existujících profilů</h2>
-                <div id="admin-profiles-list" class="space-y-2"></div>
+                <div id="admin-profiles-list" class="space-y-2">
+                    <p class="text-xs text-gray-500">Načítám profily...</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Bezpečné načtení dat s ošetřením chyb
-        let profiles = [];
-        let articles = [];
-        let externalLinks = [];
+        // Inicializace výchozích dat, pokud je paměť prázdná
+        if (!localStorage.getItem('ch_profiles')) {
+            localStorage.setItem('ch_profiles', JSON.stringify([
+                { id: 1, name: "ZAMBLI", age: 27, location: "Praha", hair: "brunette", profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", bio: "Testovací profil." }
+            ]));
+        }
 
-        try {
-            profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [];
-        } catch(e) { profiles = []; }
-
-        try {
-            articles = JSON.parse(localStorage.getItem('ch_articles')) || [];
-        } catch(e) { articles = []; }
-
-        try {
-            externalLinks = JSON.parse(localStorage.getItem('ch_links')) || [];
-        } catch(e) { externalLinks = []; }
+        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [];
+        let articles = JSON.parse(localStorage.getItem('ch_articles')) || [];
+        let externalLinks = JSON.parse(localStorage.getItem('ch_links')) || [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            const savedAd = localStorage.getItem('ch_adcode');
-            if(savedAd) document.getElementById('admin-ad-code').value = savedAd;
-
-            document.getElementById('stat-views').innerText = parseInt(localStorage.getItem('ch_site_views') || '0').toLocaleString();
             document.getElementById('stat-profiles').innerText = profiles.length;
             document.getElementById('stat-articles').innerText = articles.length;
             document.getElementById('stat-links').innerText = externalLinks.length;
-
             renderAdminProfiles();
-            renderAdminLinks();
         });
-
-        function saveAdCode() {
-            localStorage.setItem('ch_adcode', document.getElementById('admin-ad-code').value);
-            alert('Reklamní kód byl uložen!');
-        }
-
-        function addNewLink(e) {
-            e.preventDefault();
-            const fileInput = document.getElementById('l-banner-file');
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    externalLinks.push({
-                        id: Date.now(),
-                        title: document.getElementById('l-title').value,
-                        url: document.getElementById('l-url').value,
-                        banner: event.target.result,
-                        description: document.getElementById('l-desc').value
-                    });
-                    localStorage.setItem('ch_links', JSON.stringify(externalLinks));
-                    alert('Odkaz s bannerem byl úspěšně přidán!');
-                    location.reload();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                alert('Vyberte banner pro odkaz.');
-            }
-        }
-
-        function renderAdminLinks() {
-            const list = document.getElementById('admin-links-list');
-            if(!externalLinks || externalLinks.length === 0) {
-                list.innerHTML = '<p class="text-xs text-gray-500">Žádné odkazy.</p>';
-                return;
-            }
-            list.innerHTML = externalLinks.map(l => `
-                <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
-                    <div class="flex items-center space-x-2">
-                        <img src="${l.banner}" class="w-10 h-8 rounded-lg object-cover">
-                        <div>
-                            <span class="font-bold block">${l.title}</span>
-                            <a href="${l.url}" target="_blank" class="text-blue-400 text-[10px] underline">${l.url}</a>
-                        </div>
-                    </div>
-                    <button onclick="deleteLink(${l.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
-                </div>
-            `).join('');
-        }
-
-        function deleteLink(id) {
-            if(confirm('Opravdu smazat tento odkaz?')) {
-                externalLinks = externalLinks.filter(l => l.id !== id);
-                localStorage.setItem('ch_links', JSON.stringify(externalLinks));
-                renderAdminLinks();
-            }
-        }
 
         function addNewProfile(e) {
             e.preventDefault();
             const profileImgInput = document.getElementById('p-profile-img');
-            const galleryInput = document.getElementById('p-gallery-files');
 
             if (!profileImgInput.files || !profileImgInput.files[0]) {
                 alert('Vyberte hlavní profilový obrázek.');
                 return;
             }
-            if (!galleryInput.files || galleryInput.files.length === 0) {
-                alert('Vyberte alespoň jednu fotku do galerie.');
-                return;
-            }
 
-            const profileReader = new FileReader();
-            profileReader.onload = function(profileEvent) {
-                const profileImgUrl = profileEvent.target.result;
-                
-                let galleryUrls = [];
-                let filesLoaded = 0;
-                
-                Array.from(galleryInput.files).forEach((file, index) => {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        galleryUrls[index] = event.target.result;
-                        filesLoaded++;
-                        if (filesLoaded === galleryInput.files.length) {
-                            profiles.push({
-                                id: Date.now(),
-                                name: document.getElementById('p-name').value.toUpperCase(),
-                                age: parseInt(document.getElementById('p-age').value),
-                                location: document.getElementById('p-location').value,
-                                hair: document.getElementById('p-hair').value,
-                                profileImage: profileImgUrl,
-                                gallery: galleryUrls,
-                                bio: document.getElementById('p-bio').value,
-                                createdAt: Date.now()
-                            });
-                            localStorage.setItem('ch_profiles', JSON.stringify(profiles));
-                            alert('Profil byl úspěšně přidán!');
-                            location.reload();
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                });
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const newProfile = {
+                    id: Date.now(),
+                    name: document.getElementById('p-name').value.toUpperCase(),
+                    age: parseInt(document.getElementById('p-age').value),
+                    location: document.getElementById('p-location').value,
+                    hair: document.getElementById('p-hair').value,
+                    profileImage: event.target.result,
+                    gallery: [event.target.result],
+                    bio: document.getElementById('p-bio').value,
+                    createdAt: Date.now()
+                };
+
+                profiles.push(newProfile);
+                localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+                alert('Profil byl úspěšně přidán!');
+                location.reload();
             };
-            profileReader.readAsDataURL(profileImgInput.files[0]);
+            reader.readAsDataURL(profileImgInput.files[0]);
         }
 
         function renderAdminProfiles() {
@@ -254,19 +134,15 @@
                 list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily v databázi.</p>';
                 return;
             }
-            list.innerHTML = profiles.map(p => {
-                const cover = p.profileImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
-                const count = p.gallery ? p.gallery.length : 0;
-                return `
-                    <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
-                        <div class="flex items-center space-x-2">
-                            <img src="${cover}" class="w-8 h-8 rounded-lg object-cover">
-                            <span class="font-bold text-white">${p.name} (${count} fotek v galerii)</span>
-                        </div>
-                        <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+            list.innerHTML = profiles.map(p => `
+                <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <img src="${p.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}" class="w-8 h-8 rounded-lg object-cover">
+                        <span class="font-bold text-white">${p.name} (${p.age} let)</span>
                     </div>
-                `;
-            }).join('');
+                    <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                </div>
+            `).join('');
         }
 
         function deleteProfile(id) {
