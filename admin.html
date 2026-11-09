@@ -53,13 +53,13 @@
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">🔗 Přidat nový odkaz a banner</h2>
                 <form onsubmit="addNewLink(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input type="text" id="l-title" placeholder="Název odkazu / webu" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs">
-                    <input type="url" id="l-url" placeholder="URL adresa (https://...)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs">
+                    <input type="text" id="l-title" placeholder="Název odkazu / webu" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+                    <input type="url" id="l-url" placeholder="URL adresa (https://...)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                     <div class="sm:col-span-2">
                         <label class="block text-[11px] text-gray-400 mb-1">Nahrát banner z mobilu / PC:</label>
                         <input type="file" id="l-banner-file" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
                     </div>
-                    <textarea id="l-desc" placeholder="Krátký popis odkazu..." class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs" rows="2"></textarea>
+                    <textarea id="l-desc" placeholder="Krátký popis odkazu..." class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
                     <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit odkaz s bannerem</button>
                 </form>
             </div>
@@ -69,21 +69,21 @@
                 <div id="admin-links-list" class="space-y-2"></div>
             </div>
 
-            <!-- Reklama -->
+            <!-- REKLAMA -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-2">📢 Kód pro placenou reklamu</h2>
                 <textarea id="admin-ad-code" rows="2" class="w-full p-3 text-xs font-mono rounded-xl bg-gray-900 border border-gray-700 text-white mb-3" placeholder="<script>...</script>"></textarea>
                 <button onclick="saveAdCode()" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold">Uložit reklamu</button>
             </div>
 
-            <!-- PŘIDAT PROFIL (Odděleně profilový obrázek a galerie) -->
+            <!-- PŘIDAT PROFIL -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">➕ Přidat nový profil herečky</h2>
                 <form onsubmit="addNewProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input type="text" id="p-name" placeholder="Jméno (např. ZAMBLI)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs">
-                    <input type="number" id="p-age" placeholder="Věk" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs">
-                    <input type="text" id="p-location" placeholder="Lokalita (např. Praha)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs">
-                    <select id="p-hair" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs">
+                    <input type="text" id="p-name" placeholder="Jméno (např. ZAMBLI)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+                    <input type="number" id="p-age" placeholder="Věk" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+                    <input type="text" id="p-location" placeholder="Lokalita (např. Praha)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+                    <select id="p-hair" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white bg-gray-900">
                         <option value="blonde">Blond</option>
                         <option value="brunette">Brunetka</option>
                         <option value="redhead">Zrzka</option>
@@ -99,12 +99,12 @@
                         <input type="file" id="p-gallery-files" accept="image/*" multiple required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandPink file:text-white">
                     </div>
 
-                    <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs" rows="2"></textarea>
+                    <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
                     <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit profil do databáze</button>
                 </form>
             </div>
 
-            <!-- Správa profilů -->
+            <!-- SPRÁVA PROFILŮ -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📋 Správa existujících profilů</h2>
                 <div id="admin-profiles-list" class="space-y-2"></div>
@@ -113,9 +113,22 @@
     </div>
 
     <script>
-        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [];
-        let articles = JSON.parse(localStorage.getItem('ch_articles')) || [];
-        let externalLinks = JSON.parse(localStorage.getItem('ch_links')) || [];
+        // Bezpečné načtení dat s ošetřením chyb
+        let profiles = [];
+        let articles = [];
+        let externalLinks = [];
+
+        try {
+            profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [];
+        } catch(e) { profiles = []; }
+
+        try {
+            articles = JSON.parse(localStorage.getItem('ch_articles')) || [];
+        } catch(e) { articles = []; }
+
+        try {
+            externalLinks = JSON.parse(localStorage.getItem('ch_links')) || [];
+        } catch(e) { externalLinks = []; }
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedAd = localStorage.getItem('ch_adcode');
@@ -160,7 +173,7 @@
 
         function renderAdminLinks() {
             const list = document.getElementById('admin-links-list');
-            if(externalLinks.length === 0) {
+            if(!externalLinks || externalLinks.length === 0) {
                 list.innerHTML = '<p class="text-xs text-gray-500">Žádné odkazy.</p>';
                 return;
             }
@@ -186,7 +199,6 @@
             }
         }
 
-        // ZPRACOVÁNÍ PROFILU S ODLIŠNOU PROFILOVKOU A GALERIÍ
         function addNewProfile(e) {
             e.preventDefault();
             const profileImgInput = document.getElementById('p-profile-img');
@@ -238,8 +250,8 @@
 
         function renderAdminProfiles() {
             const list = document.getElementById('admin-profiles-list');
-            if(profiles.length === 0) {
-                list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily.</p>';
+            if(!profiles || profiles.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily v databázi.</p>';
                 return;
             }
             list.innerHTML = profiles.map(p => {
@@ -249,7 +261,7 @@
                     <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
                         <div class="flex items-center space-x-2">
                             <img src="${cover}" class="w-8 h-8 rounded-lg object-cover">
-                            <span class="font-bold">${p.name} (${count} fotek v galerii)</span>
+                            <span class="font-bold text-white">${p.name} (${count} fotek v galerii)</span>
                         </div>
                         <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
                     </div>
@@ -258,7 +270,7 @@
         }
 
         function deleteProfile(id) {
-            if(confirm('Opravdu smazat?')) {
+            if(confirm('Opravdu smazat tento profil?')) {
                 profiles = profiles.filter(p => p.id !== id);
                 localStorage.setItem('ch_profiles', JSON.stringify(profiles));
                 renderAdminProfiles();
