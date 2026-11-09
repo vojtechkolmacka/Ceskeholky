@@ -33,7 +33,6 @@
         .banner-pc { width: 100%; max-height: 340px; object-fit: cover; object-position: center; }
         .banner-mobil { width: 100%; height: auto; object-fit: contain; background-color: #0b1329; display: block; }
         
-        /* Stylování pro Bio text, aby nebyl slévaný špalek */
         .bio-text p {
             margin-bottom: 0.85rem;
             line-height: 1.6;
@@ -85,8 +84,8 @@
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
                     <div>
-                        <label class="block text-[11px] font-semibold text-gray-500 mb-1">Jméno</label>
-                        <input type="text" id="search-input" oninput="filterAndRenderProfiles()" placeholder="Hledat jméno..." class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-brandBlue bg-gray-50/50">
+                        <label class="block text-[11px] font-semibold text-gray-500 mb-1">Hledat (jméno nebo text v biu)</label>
+                        <input type="text" id="search-input" oninput="filterAndRenderProfiles()" placeholder="Klíčové slovo..." class="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs focus:ring-2 focus:ring-brandBlue bg-gray-50/50">
                     </div>
                     <div>
                         <label class="block text-[11px] font-semibold text-gray-500 mb-1">Barva vlasů</label>
@@ -249,15 +248,19 @@
             if(tabId === 'profiles') renderFullProfiles();
         }
 
+        // ROZŠÍŘENÉ VYHLEDÁVÁNÍ (Hledá jak ve jménu, tak v textu v biu)
         function filterAndRenderProfiles() {
-            const search = document.getElementById('search-input').value.toLowerCase();
+            const search = document.getElementById('search-input').value.toLowerCase().trim();
             const hair = document.getElementById('filter-hair').value;
             const ageGroup = document.getElementById('filter-age').value;
             const location = document.getElementById('filter-location').value;
             const sortBy = document.getElementById('filter-sort').value;
 
             let filtered = profiles.filter(p => {
-                const matchSearch = p.name.toLowerCase().includes(search);
+                const nameMatch = p.name ? p.name.toLowerCase().includes(search) : false;
+                const bioMatch = p.bio ? p.bio.toLowerCase().includes(search) : false;
+                const matchSearch = search === '' || nameMatch || bioMatch;
+
                 const matchHair = !hair || p.hair === hair;
                 const matchLoc = !location || (p.location && p.location.toLowerCase() === location.toLowerCase());
                 
@@ -316,7 +319,6 @@
             if(!p) return;
             const galleryArray = p.gallery && p.gallery.length > 0 ? p.gallery : [];
 
-            // Převedení enterů v bio textu na HTML odstavce, aby to nebyl slévaný špalek
             let formattedBio = p.bio ? p.bio.split('\n').map(par => `<p>${par.trim()}</p>`).join('') : '<p>Žádný životopis není k dispozici.</p>';
 
             document.getElementById('modal-content').innerHTML = `
@@ -333,7 +335,6 @@
                         <button onclick="switchModalTab('gallery')" id="modal-tab-gallery" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 hover:bg-gray-200 transition">🖼️ Galerie (${galleryArray.length})</button>
                     </div>
 
-                    <!-- Naformátovaný Bio text rozdělený do odstavců -->
                     <div id="modal-content-bio" class="w-full text-xs text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-2xl border mb-4 bio-text max-h-72 overflow-y-auto">
                         ${formattedBio}
                     </div>
