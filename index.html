@@ -32,6 +32,15 @@
         .profile-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
         .banner-pc { width: 100%; max-height: 340px; object-fit: cover; object-position: center; }
         .banner-mobil { width: 100%; height: auto; object-fit: contain; background-color: #0b1329; display: block; }
+        
+        /* Stylování pro Bio text, aby nebyl slévaný špalek */
+        .bio-text p {
+            margin-bottom: 0.85rem;
+            line-height: 1.6;
+        }
+        .bio-text p:last-child {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col font-sans antialiased">
@@ -172,7 +181,7 @@
         <img id="lightbox-img" src="" class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl">
     </div>
 
-    <!-- PATIČKA S VYNULLOVANÝM POČÍTADLEM -->
+    <!-- PATIČKA -->
     <footer class="bg-white border-t py-6 mt-12 text-center text-xs text-gray-500 space-y-2">
         <p>ČESKÉ HOLKY • Všechna práva vyhrazena © 2026</p>
         <p class="text-[11px] text-gray-400">👁️ Celkem zobrazení webu: <strong id="site-visitor-counter" class="text-brandBlue font-bold">0</strong></p>
@@ -203,7 +212,6 @@
         let adCode = localStorage.getItem('ch_adcode') || '';
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Vynulování/Inicializace počítadla od 0
             let views = parseInt(localStorage.getItem('ch_site_views') || '0');
             views++;
             localStorage.setItem('ch_site_views', views);
@@ -308,6 +316,9 @@
             if(!p) return;
             const galleryArray = p.gallery && p.gallery.length > 0 ? p.gallery : [];
 
+            // Převedení enterů v bio textu na HTML odstavce, aby to nebyl slévaný špalek
+            let formattedBio = p.bio ? p.bio.split('\n').map(par => `<p>${par.trim()}</p>`).join('') : '<p>Žádný životopis není k dispozici.</p>';
+
             document.getElementById('modal-content').innerHTML = `
                 <div class="flex flex-col items-center">
                     <h2 class="text-xl font-extrabold mb-1">${p.name}</h2>
@@ -322,8 +333,9 @@
                         <button onclick="switchModalTab('gallery')" id="modal-tab-gallery" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-600 hover:bg-gray-200 transition">🖼️ Galerie (${galleryArray.length})</button>
                     </div>
 
-                    <div id="modal-content-bio" class="w-full text-xs text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-2xl border mb-4">
-                        ${p.bio || 'Žádný životopis není k dispozici.'}
+                    <!-- Naformátovaný Bio text rozdělený do odstavců -->
+                    <div id="modal-content-bio" class="w-full text-xs text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-2xl border mb-4 bio-text max-h-72 overflow-y-auto">
+                        ${formattedBio}
                     </div>
 
                     <div id="modal-content-gallery" class="w-full hidden space-y-3 max-h-72 overflow-y-auto pr-1">
