@@ -23,7 +23,7 @@
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
                 <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Správa profilů a obsahu</p>
+                <p class="text-xs text-gray-400 mt-0.5">Kompletní správa profilů, článků a odkazů</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
@@ -41,11 +41,56 @@
                 </div>
                 <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700 col-span-2 sm:col-span-1">
                     <span class="block text-xl font-black text-yellow-400" id="stat-links">0</span>
-                    <span class="text-[10px] text-gray-400">Odkazy</span>
+                    <span class="text-[10px] text-gray-400">Odkazy & bannery</span>
                 </div>
             </div>
 
-            <!-- PŘIDAT PROFIL -->
+            <!-- 1. PŘIDAT ODKAZ S BANNEREM -->
+            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
+                <h2 class="text-base font-bold mb-3">🔗 Přidat nový odkaz a banner</h2>
+                <form onsubmit="addNewLink(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="text" id="l-title" placeholder="Název odkazu / webu" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+                    <input type="url" id="l-url" placeholder="URL adresa (https://...)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+                    <div class="sm:col-span-2">
+                        <label class="block text-[11px] text-gray-400 mb-1">Nahrát banner z mobilu / PC:</label>
+                        <input type="file" id="l-banner-file" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
+                    </div>
+                    <textarea id="l-desc" placeholder="Krátký popis odkazu..." class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
+                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit odkaz s bannerem</button>
+                </form>
+            </div>
+
+            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
+                <h2 class="text-base font-bold mb-3">📋 Správa existujících odkazů</h2>
+                <div id="admin-links-list" class="space-y-2"></div>
+            </div>
+
+            <!-- 2. PŘIDAT ČLÁNEK S TLAČÍTKY PRO FOTO A ODKAZ DO TEXTU -->
+            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
+                <h2 class="text-base font-bold mb-3">📑 Přidat nový článek</h2>
+                <form onsubmit="addNewArticle(event)" class="space-y-3">
+                    <input type="text" id="a-title" placeholder="Nadpis článku" required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+                    <div>
+                        <label class="block text-[11px] text-gray-400 mb-1">Obsah článku:</label>
+                        <textarea id="a-text" placeholder="Napište text článku..." required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="4"></textarea>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="insertArticleLink()" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold">🔗 Vložit odkaz do textu</button>
+                        <label class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer">
+                            <span>📷 Vložit obrázek z mobilu</span>
+                            <input type="file" id="a-inline-img" accept="image/*" class="hidden" onchange="insertArticleImage(this)">
+                        </label>
+                    </div>
+                    <button type="submit" class="bg-brandBlue text-white px-4 py-2.5 rounded-xl text-xs font-semibold w-full mt-2">Publikovat článek</button>
+                </form>
+            </div>
+
+            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
+                <h2 class="text-base font-bold mb-3">📋 Správa existujících článků</h2>
+                <div id="admin-articles-list" class="space-y-2"></div>
+            </div>
+
+            <!-- 3. PŘIDAT PROFIL -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">➕ Přidat nový profil herečky</h2>
                 <form onsubmit="addNewProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -71,32 +116,137 @@
             <!-- SPRÁVA PROFILŮ -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📋 Správa existujících profilů</h2>
-                <div id="admin-profiles-list" class="space-y-2">
-                    <p class="text-xs text-gray-500">Načítám profily...</p>
-                </div>
+                <div id="admin-profiles-list" class="space-y-2"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Inicializace výchozích dat, pokud je paměť prázdná
-        if (!localStorage.getItem('ch_profiles')) {
-            localStorage.setItem('ch_profiles', JSON.stringify([
-                { id: 1, name: "ZAMBLI", age: 27, location: "Praha", hair: "brunette", profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", bio: "Testovací profil." }
-            ]));
-        }
+        let profiles = [];
+        let articles = [];
+        let externalLinks = [];
 
-        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [];
-        let articles = JSON.parse(localStorage.getItem('ch_articles')) || [];
-        let externalLinks = JSON.parse(localStorage.getItem('ch_links')) || [];
+        try { profiles = JSON.parse(localStorage.getItem('ch_profiles')) || []; } catch(e) { profiles = []; }
+        try { articles = JSON.parse(localStorage.getItem('ch_articles')) || []; } catch(e) { articles = []; }
+        try { externalLinks = JSON.parse(localStorage.getItem('ch_links')) || []; } catch(e) { externalLinks = []; }
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('stat-profiles').innerText = profiles.length;
             document.getElementById('stat-articles').innerText = articles.length;
             document.getElementById('stat-links').innerText = externalLinks.length;
+
             renderAdminProfiles();
+            renderAdminArticles();
+            renderAdminLinks();
         });
 
+        // ODKAZY S BANNERY
+        function addNewLink(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('l-banner-file');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    externalLinks.push({
+                        id: Date.now(),
+                        title: document.getElementById('l-title').value,
+                        url: document.getElementById('l-url').value,
+                        banner: event.target.result,
+                        description: document.getElementById('l-desc').value
+                    });
+                    localStorage.setItem('ch_links', JSON.stringify(externalLinks));
+                    alert('Odkaz s bannerem byl úspěšně přídán!');
+                    location.reload();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                alert('Vyberte banner.');
+            }
+        }
+
+        function renderAdminLinks() {
+            const list = document.getElementById('admin-links-list');
+            if(!externalLinks || externalLinks.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500">Žádné odkazy.</p>';
+                return;
+            }
+            list.innerHTML = externalLinks.map(l => `
+                <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <img src="${l.banner}" class="w-10 h-8 rounded-lg object-cover">
+                        <div>
+                            <span class="font-bold text-white block">${l.title}</span>
+                            <a href="${l.url}" target="_blank" class="text-blue-400 text-[10px] underline">${l.url}</a>
+                        </div>
+                    </div>
+                    <button onclick="deleteLink(${l.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteLink(id) {
+            if(confirm('Smazat odkaz?')) {
+                externalLinks = externalLinks.filter(l => l.id !== id);
+                localStorage.setItem('ch_links', JSON.stringify(externalLinks));
+                renderAdminLinks();
+            }
+        }
+
+        // ČLÁNKY S ODKAZY A FOTKAMI
+        function insertArticleLink() {
+            const url = prompt("Zadejte URL adresu odkazu:");
+            if (!url) return;
+            const text = prompt("Zadejte text odkazu:", url);
+            document.getElementById('a-text').value += ` <a href="${url}" target="_blank" class="text-blue-400 underline font-semibold">${text || url}</a> `;
+        }
+
+        function insertArticleImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('a-text').value += ` <br><img src="${e.target.result}" class="w-full rounded-2xl my-2 max-h-60 object-cover"><br> `;
+                    alert('Obrázek byl vložen do textu!');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function addNewArticle(e) {
+            e.preventDefault();
+            articles.unshift({
+                id: Date.now(),
+                title: document.getElementById('a-title').value,
+                date: new Date().toLocaleDateString('cs-CZ'),
+                content: document.getElementById('a-text').value.replace(/\n/g, '<br>')
+            });
+            localStorage.setItem('ch_articles', JSON.stringify(articles));
+            alert('Článek publikován!');
+            location.reload();
+        }
+
+        function renderAdminArticles() {
+            const list = document.getElementById('admin-articles-list');
+            if(!articles || articles.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500">Žádné články.</p>';
+                return;
+            }
+            list.innerHTML = articles.map(a => `
+                <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
+                    <span class="font-bold text-white">${a.title} (${a.date})</span>
+                    <button onclick="deleteArticle(${a.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteArticle(id) {
+            if(confirm('Smazat článek?')) {
+                articles = articles.filter(a => a.id !== id);
+                localStorage.setItem('ch_articles', JSON.stringify(articles));
+                renderAdminArticles();
+            }
+        }
+
+        // PROFILY
         function addNewProfile(e) {
             e.preventDefault();
             const profileImgInput = document.getElementById('p-profile-img');
@@ -137,7 +287,7 @@
             list.innerHTML = profiles.map(p => `
                 <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
                     <div class="flex items-center space-x-2">
-                        <img src="${p.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}" class="w-8 h-8 rounded-lg object-cover">
+                        <img src="${p.profileImage}" class="w-8 h-8 rounded-lg object-cover">
                         <span class="font-bold text-white">${p.name} (${p.age} let)</span>
                     </div>
                     <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
