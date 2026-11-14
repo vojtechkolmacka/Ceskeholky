@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PWA Administrace – České Holky</title>
+    <title>PWA Administrace – Kompletní správa</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -22,22 +22,20 @@
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
-                <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Správa obsahu a zálohování dat</p>
+                <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace – Plná správa</h1>
+                <p class="text-xs text-gray-400 mt-0.5">Upravuj, přidávej a spravuj veškerý obsah webu</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
 
         <div class="space-y-6">
-            <!-- ZÁLOHOVÁNÍ DAT (100% jistota, že nic nezmizí) -->
+            <!-- ZÁLOHOVÁNÍ DAT -->
             <div class="bg-gradient-to-r from-blue-900/40 to-purple-900/40 p-5 rounded-3xl border border-blue-500/30">
                 <h2 class="text-base font-bold mb-1 text-white">💾 Bezpečnostní záloha dat</h2>
-                <p class="text-xs text-gray-300 mb-4">Aby ti data v mobilu nikdy nezmizela, můžeš si je jedním kliknutím stáhnout nebo kdykoliv obnovit ze souboru.</p>
+                <p class="text-xs text-gray-300 mb-4">Stáhni si zálohu do telefonu nebo ji kdykoliv obnov ze souboru.</p>
                 <div class="flex flex-wrap gap-3">
-                    <button onclick="downloadBackup()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow flex items-center space-x-1">
-                        <span>📥 Stáhnout zálohu dat (.json)</span>
-                    </button>
-                    <label class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow cursor-pointer flex items-center space-x-1">
+                    <button onclick="downloadBackup()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow">📥 Stáhnout zálohu dat (.json)</button>
+                    <label class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow cursor-pointer">
                         <span>📤 Obnovit ze zálohy</span>
                         <input type="file" accept=".json" onchange="restoreBackup(event)" class="hidden">
                     </label>
@@ -60,6 +58,24 @@
                 </div>
             </div>
 
+            <!-- SPRÁVA HLAVNÍCH BANNERŮ WEBU -->
+            <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
+                <h2 class="text-base font-bold mb-2">🖼️ Správa horních bannerů webu</h2>
+                <p class="text-xs text-gray-400 mb-3">Zde můžeš nahrát nebo změnit hlavní bannery zobrazené nahoře na webu.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700">
+                        <label class="block text-xs font-bold text-brandCyan mb-1">PC Banner (Široký):</label>
+                        <input type="file" accept="image/*" id="banner-pc-file" class="w-full text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:bg-brandBlue file:text-white mb-2">
+                        <button onclick="saveSiteBanner('pc')" class="w-full bg-brandBlue text-white py-2 rounded-xl text-xs font-semibold">Uložit PC banner</button>
+                    </div>
+                    <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700">
+                        <label class="block text-xs font-bold text-brandCyan mb-1">Mobilní Banner:</label>
+                        <input type="file" accept="image/*" id="banner-mobil-file" class="w-full text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:bg-brandBlue file:text-white mb-2">
+                        <button onclick="saveSiteBanner('mobil')" class="w-full bg-brandBlue text-white py-2 rounded-xl text-xs font-semibold">Uložit mobilní banner</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Reklama -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-2">📢 Kód pro placenou reklamu</h2>
@@ -67,18 +83,22 @@
                 <button onclick="saveAdCode()" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold">Uložit reklamu</button>
             </div>
 
-            <!-- PŘIDAT ODKAZ -->
+            <!-- PŘIDAT / UPRAVIT ODKAZ -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
-                <h2 class="text-base font-bold mb-3">🔗 Přidat nový odkaz a banner</h2>
-                <form onsubmit="addNewLink(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <h2 id="link-form-title" class="text-base font-bold mb-3">🔗 Přidat nový odkaz a banner</h2>
+                <form onsubmit="saveLink(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="hidden" id="l-edit-id">
                     <input type="text" id="l-title" placeholder="Název odkazu / webu" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                     <input type="url" id="l-url" placeholder="URL adresa (https://...)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                     <div class="sm:col-span-2">
-                        <label class="block text-[11px] text-gray-400 mb-1">Nahrát banner z mobilu / PC:</label>
-                        <input type="file" id="l-banner-file" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
+                        <label class="block text-[11px] text-gray-400 mb-1">Banner odkazu (nech prázdné pro zachování stávajícího při úpravě):</label>
+                        <input type="file" id="l-banner-file" accept="image/*" class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
                     </div>
                     <textarea id="l-desc" placeholder="Krátký popis odkazu..." class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
-                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit odkaz</button>
+                    <div class="sm:col-span-2 flex gap-2">
+                        <button type="submit" id="link-submit-btn" class="flex-1 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit odkaz</button>
+                        <button type="button" onclick="resetLinkForm()" id="link-cancel-btn" class="hidden bg-gray-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold">Zrušit</button>
+                    </div>
                 </form>
             </div>
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
@@ -86,10 +106,11 @@
                 <div id="admin-links-list" class="space-y-2"></div>
             </div>
 
-            <!-- PŘIDAT ČLÁNEK -->
+            <!-- PŘIDAT / UPRAVIT ČLÁNEK -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
-                <h2 class="text-base font-bold mb-3">📑 Přidat nový článek</h2>
-                <form onsubmit="addNewArticle(event)" class="space-y-3">
+                <h2 id="article-form-title" class="text-base font-bold mb-3">📑 Přidat nový článek</h2>
+                <form onsubmit="saveArticle(event)" class="space-y-3">
+                    <input type="hidden" id="a-edit-id">
                     <input type="text" id="a-title" placeholder="Nadpis článku" required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                     <textarea id="a-text" placeholder="Napište text článku..." required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="4"></textarea>
                     <div class="flex flex-wrap gap-2">
@@ -99,7 +120,10 @@
                             <input type="file" id="a-inline-img" accept="image/*" class="hidden" onchange="insertArticleImage(this)">
                         </label>
                     </div>
-                    <button type="submit" class="bg-brandBlue text-white px-4 py-2.5 rounded-xl text-xs font-semibold w-full mt-2">Publikovat článek</button>
+                    <div class="flex gap-2">
+                        <button type="submit" id="article-submit-btn" class="flex-1 bg-brandBlue text-white py-2.5 rounded-xl font-semibold text-xs">Publikovat článek</button>
+                        <button type="button" onclick="resetArticleForm()" id="article-cancel-btn" class="hidden bg-gray-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold">Zrušit</button>
+                    </div>
                 </form>
             </div>
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
@@ -107,31 +131,36 @@
                 <div id="admin-articles-list" class="space-y-2"></div>
             </div>
 
-            <!-- PŘIDAT PROFIL -->
+            <!-- PŘIDAT / UPRAVIT PROFIL -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
-                <h2 class="text-base font-bold mb-3">➕ Přidat nový profil herečky</h2>
-                <form onsubmit="addNewProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <h2 id="profile-form-title" class="text-base font-bold mb-3">➕ Přidat nový profil herečky</h2>
+                <form onsubmit="saveProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input type="hidden" id="p-edit-id">
                     <input type="text" id="p-name" placeholder="Jméno (např. ZAMBLI)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                     <input type="number" id="p-age" placeholder="Věk" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                     <input type="text" id="p-location" placeholder="Lokalita (např. Praha)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
-                    <select id="p-hair" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+                    <select id="p-hair" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white bg-gray-900">
                         <option value="blonde">Blond</option>
                         <option value="brunette">Brunetka</option>
                         <option value="redhead">Zrzka</option>
                     </select>
 
                     <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
-                        <label class="block text-[11px] font-bold text-brandBlue mb-1">Hlavní profilový obrázek:</label>
-                        <input type="file" id="p-profile-img" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
+                        <label class="block text-[11px] font-bold text-brandBlue mb-1">Hlavní profilový obrázek (nech prázdné pro zachování):</label>
+                        <input type="file" id="p-profile-img" accept="image/*" class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
                     </div>
 
                     <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
-                        <label class="block text-[11px] font-bold text-brandPink mb-1">Fotografie do galerie (více fotek najednou):</label>
-                        <input type="file" id="p-gallery-files" accept="image/*" multiple required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandPink file:text-white">
+                        <label class="block text-[11px] font-bold text-brandPink mb-1">Fotografie do galerie (přidá nové fotky k existujícím):</label>
+                        <input type="file" id="p-gallery-files" accept="image/*" multiple class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandPink file:text-white">
                     </div>
 
                     <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
-                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit profil</button>
+                    
+                    <div class="sm:col-span-2 flex gap-2">
+                        <button type="submit" id="profile-submit-btn" class="flex-1 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit profil</button>
+                        <button type="button" onclick="resetProfileForm()" id="profile-cancel-btn" class="hidden bg-gray-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold">Zrušit</button>
+                    </div>
                 </form>
             </div>
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
@@ -202,6 +231,20 @@
             alert('Reklamní kód byl uložen!');
         }
 
+        function saveSiteBanner(type) {
+            const inputId = type === 'pc' ? 'banner-pc-file' : 'banner-mobil-file';
+            const fileInput = document.getElementById(inputId);
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert('Vyberte obrázek banneru.');
+                return;
+            }
+            resizeImage(fileInput.files[0], 1200, 600, function(compressedImg) {
+                localStorage.setItem(type === 'pc' ? 'ch_banner_pc' : 'ch_banner_mobil', compressedImg);
+                alert('Banner byl úspěšně aktualizován!');
+                location.reload();
+            });
+        }
+
         function resizeImage(file, maxWidth, maxHeight, callback) {
             const reader = new FileReader();
             reader.onload = function (e) {
@@ -226,23 +269,63 @@
             reader.readAsDataURL(file);
         }
 
-        async function addNewLink(e) {
+        // --- SPRÁVA ODKAZŮ ---
+        function saveLink(e) {
             e.preventDefault();
+            const editId = document.getElementById('l-edit-id').value;
+            const title = document.getElementById('l-title').value;
+            const url = document.getElementById('l-url').value;
+            const desc = document.getElementById('l-desc').value;
             const fileInput = document.getElementById('l-banner-file');
-            if (fileInput.files && fileInput.files[0]) {
-                resizeImage(fileInput.files[0], 800, 600, function(compressedImg) {
+
+            const proceed = (bannerUrl) => {
+                if (editId) {
+                    let item = externalLinks.find(x => x.id == editId);
+                    if (item) {
+                        item.title = title;
+                        item.url = url;
+                        item.description = desc;
+                        if (bannerUrl) item.banner = bannerUrl;
+                    }
+                } else {
                     externalLinks.push({
                         id: Date.now(),
-                        title: document.getElementById('l-title').value,
-                        url: document.getElementById('l-url').value,
-                        banner: compressedImg,
-                        description: document.getElementById('l-desc').value
+                        title, url, description: desc,
+                        banner: bannerUrl || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80'
                     });
-                    localStorage.setItem('ch_links', JSON.stringify(externalLinks));
-                    alert('Odkaz byl uložen!');
-                    location.reload();
-                });
+                }
+                localStorage.setItem('ch_links', JSON.stringify(externalLinks));
+                alert('Odkaz byl uložen!');
+                location.reload();
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                resizeImage(fileInput.files[0], 800, 600, proceed);
+            } else {
+                let existingBanner = editId ? externalLinks.find(x => x.id == editId)?.banner : '';
+                proceed(existingBanner);
             }
+        }
+
+        function editLink(id) {
+            const l = externalLinks.find(x => x.id === id);
+            if(!l) return;
+            document.getElementById('l-edit-id').value = l.id;
+            document.getElementById('l-title').value = l.title;
+            document.getElementById('l-url').value = l.url;
+            document.getElementById('l-desc').value = l.description || '';
+            document.getElementById('link-form-title').innerText = '✏️ Upravit odkaz: ' + l.title;
+            document.getElementById('link-submit-btn').innerText = 'Aktualizovat odkaz';
+            document.getElementById('link-cancel-btn').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('link-form-title').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        function resetLinkForm() {
+            document.getElementById('l-edit-id').value = '';
+            document.querySelector('#link-form-title').closest('form').reset();
+            document.getElementById('link-form-title').innerText = '🔗 Přidat nový odkaz a banner';
+            document.getElementById('link-submit-btn').innerText = 'Uložit odkaz';
+            document.getElementById('link-cancel-btn').classList.add('hidden');
         }
 
         function renderAdminLinks() {
@@ -254,7 +337,10 @@
                         <img src="${l.banner}" class="w-10 h-8 rounded-lg object-cover">
                         <span class="font-bold text-white">${l.title}</span>
                     </div>
-                    <button onclick="deleteLink(${l.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                    <div class="flex gap-1.5">
+                        <button onclick="editLink(${l.id})" class="bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-lg">Upravit</button>
+                        <button onclick="deleteLink(${l.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -267,6 +353,7 @@
             }
         }
 
+        // --- SPRÁVA ČLÁNKŮ ---
         function insertArticleLink() {
             const url = prompt("URL adresa:");
             if (!url) return;
@@ -283,17 +370,49 @@
             }
         }
 
-        function addNewArticle(e) {
+        function saveArticle(e) {
             e.preventDefault();
-            articles.unshift({
-                id: Date.now(),
-                title: document.getElementById('a-title').value,
-                date: new Date().toLocaleDateString('cs-CZ'),
-                content: document.getElementById('a-text').value.replace(/\n/g, '<br>')
-            });
+            const editId = document.getElementById('a-edit-id').value;
+            const title = document.getElementById('a-title').value;
+            const content = document.getElementById('a-text').value.replace(/\n/g, '<br>');
+
+            if (editId) {
+                let art = articles.find(x => x.id == editId);
+                if (art) {
+                    art.title = title;
+                    art.content = content;
+                }
+            } else {
+                articles.unshift({
+                    id: Date.now(),
+                    title,
+                    date: new Date().toLocaleDateString('cs-CZ'),
+                    content
+                });
+            }
             localStorage.setItem('ch_articles', JSON.stringify(articles));
-            alert('Článek publikován!');
+            alert('Článek uložen!');
             location.reload();
+        }
+
+        function editArticle(id) {
+            const a = articles.find(x => x.id === id);
+            if(!a) return;
+            document.getElementById('a-edit-id').value = a.id;
+            document.getElementById('a-title').value = a.title;
+            document.getElementById('a-text').value = a.content.replace(/<br>/g, '\n');
+            document.getElementById('article-form-title').innerText = '✏️ Upravit článek: ' + a.title;
+            document.getElementById('article-submit-btn').innerText = 'Aktualizovat článek';
+            document.getElementById('article-cancel-btn').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('article-form-title').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        function resetArticleForm() {
+            document.getElementById('a-edit-id').value = '';
+            document.querySelector('#article-form-title').closest('form').reset();
+            document.getElementById('article-form-title').innerText = '📑 Přidat nový článek';
+            document.getElementById('article-submit-btn').innerText = 'Publikovat článek';
+            document.getElementById('article-cancel-btn').classList.add('hidden');
         }
 
         function renderAdminArticles() {
@@ -302,7 +421,10 @@
             list.innerHTML = articles.map(a => `
                 <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
                     <span class="font-bold text-white">${a.title}</span>
-                    <button onclick="deleteArticle(${a.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                    <div class="flex gap-1.5">
+                        <button onclick="editArticle(${a.id})" class="bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-lg">Upravit</button>
+                        <button onclick="deleteArticle(${a.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -315,50 +437,120 @@
             }
         }
 
-        function addNewProfile(e) {
+        // --- SPRÁVA PROFILŮ ---
+        function saveProfile(e) {
             e.preventDefault();
+            const editId = document.getElementById('p-edit-id').value;
+            const name = document.getElementById('p-name').value.toUpperCase();
+            const age = parseInt(document.getElementById('p-age').value);
+            const location = document.getElementById('p-location').value;
+            const hair = document.getElementById('p-hair').value;
+            const bio = document.getElementById('p-bio').value;
+
             const profileImgInput = document.getElementById('p-profile-img');
             const galleryInput = document.getElementById('p-gallery-files');
 
-            resizeImage(profileImgInput.files[0], 600, 800, function(compressedProfileImg) {
+            const finishProfile = (coverImg, newGallery) => {
+                if (editId) {
+                    let p = profiles.find(x => x.id == editId);
+                    if (p) {
+                        p.name = name;
+                        p.age = age;
+                        p.location = location;
+                        p.hair = hair;
+                        p.bio = bio;
+                        if (coverImg) p.profileImage = coverImg;
+                        if (newGallery.length > 0) {
+                            p.gallery = p.gallery ? p.gallery.concat(newGallery) : newGallery;
+                        }
+                    }
+                } else {
+                    profiles.push({
+                        id: Date.now(),
+                        name, age, location, hair, bio,
+                        profileImage: coverImg,
+                        gallery: newGallery,
+                        createdAt: Date.now()
+                    });
+                }
+                localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+                alert('Profil byl úspěšně uložen!');
+                location.reload();
+            };
+
+            // Zpracování obrázků
+            const processGalleryAndSave = (cover) => {
                 let galleryUrls = [];
                 let filesLoaded = 0;
-                const galleryFiles = Array.from(galleryInput.files);
+                const galleryFiles = galleryInput.files ? Array.from(galleryInput.files) : [];
+
+                if (galleryFiles.length === 0) {
+                    finishProfile(cover, []);
+                    return;
+                }
 
                 galleryFiles.forEach((file, index) => {
-                    resizeImage(file, 800, 1000, function(compressedGalleryImg) {
-                        galleryUrls[index] = compressedGalleryImg;
+                    resizeImage(file, 800, 1000, function(compressed) {
+                        galleryUrls[index] = compressed;
                         filesLoaded++;
                         if (filesLoaded === galleryFiles.length) {
-                            profiles.push({
-                                id: Date.now(),
-                                name: document.getElementById('p-name').value.toUpperCase(),
-                                age: parseInt(document.getElementById('p-age').value),
-                                location: document.getElementById('p-location').value,
-                                hair: document.getElementById('p-hair').value,
-                                profileImage: compressedProfileImg,
-                                gallery: galleryUrls,
-                                bio: document.getElementById('p-bio').value,
-                                createdAt: Date.now()
-                            });
-                            localStorage.setItem('ch_profiles', JSON.stringify(profiles));
-                            alert('Profil uložen!');
-                            location.reload();
+                            finishProfile(cover, galleryUrls);
                         }
                     });
                 });
-            });
+            };
+
+            if (profileImgInput.files && profileImgInput.files[0]) {
+                resizeImage(profileImgInput.files[0], 600, 800, function(compressedCover) {
+                    processGalleryAndSave(compressedCover);
+                });
+            } else {
+                let existingCover = editId ? profiles.find(x => x.id == editId)?.profileImage : '';
+                processGalleryAndSave(existingCover);
+            }
+        }
+
+        function editProfile(id) {
+            const p = profiles.find(x => x.id === id);
+            if(!p) return;
+            document.getElementById('p-edit-id').value = p.id;
+            document.getElementById('p-name').value = p.name;
+            document.getElementById('p-age').value = p.age;
+            document.getElementById('p-location').value = p.location || '';
+            document.getElementById('p-hair').value = p.hair || 'brunette';
+            document.getElementById('p-bio').value = p.bio || '';
+            document.getElementById('profile-form-title').innerText = '✏️ Upravit profil: ' + p.name;
+            document.getElementById('profile-submit-btn').innerText = 'Aktualizovat profil';
+            document.getElementById('profile-cancel-btn').classList.remove('hidden');
+            window.scrollTo({ top: document.getElementById('profile-form-title').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        function resetProfileForm() {
+            document.getElementById('p-edit-id').value = '';
+            document.querySelector('#profile-form-title').closest('form').reset();
+            document.getElementById('profile-form-title').innerText = '➕ Přidat nový profil herečky';
+            document.getElementById('profile-submit-btn').innerText = 'Uložit profil';
+            document.getElementById('profile-cancel-btn').classList.add('hidden');
         }
 
         function renderAdminProfiles() {
             const list = document.getElementById('admin-profiles-list');
             if(!profiles.length) { list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily.</p>'; return; }
-            list.innerHTML = profiles.map(p => `
-                <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
-                    <span class="font-bold text-white">${p.name}</span>
-                    <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
-                </div>
-            `).join('');
+            list.innerHTML = profiles.map(p => {
+                const cover = p.profileImage || (p.gallery && p.gallery[0] ? p.gallery[0] : '');
+                return `
+                    <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <img src="${cover}" class="w-8 h-8 rounded-lg object-cover">
+                            <span class="font-bold text-white">${p.name}</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="editProfile(${p.id})" class="bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-lg">Upravit</button>
+                            <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function deleteProfile(id) {
