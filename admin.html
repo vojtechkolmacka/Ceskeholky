@@ -6,8 +6,6 @@
     <title>PWA Administrace – České Holky</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -24,13 +22,28 @@
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
-                <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace (Cloud)</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Připojeno k Supabase databázi</p>
+                <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace</h1>
+                <p class="text-xs text-gray-400 mt-0.5">Správa obsahu a zálohování dat</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
 
         <div class="space-y-6">
+            <!-- ZÁLOHOVÁNÍ DAT (100% jistota, že nic nezmizí) -->
+            <div class="bg-gradient-to-r from-blue-900/40 to-purple-900/40 p-5 rounded-3xl border border-blue-500/30">
+                <h2 class="text-base font-bold mb-1 text-white">💾 Bezpečnostní záloha dat</h2>
+                <p class="text-xs text-gray-300 mb-4">Aby ti data v mobilu nikdy nezmizela, můžeš si je jedním kliknutím stáhnout nebo kdykoliv obnovit ze souboru.</p>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="downloadBackup()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow flex items-center space-x-1">
+                        <span>📥 Stáhnout zálohu dat (.json)</span>
+                    </button>
+                    <label class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow cursor-pointer flex items-center space-x-1">
+                        <span>📤 Obnovit ze zálohy</span>
+                        <input type="file" accept=".json" onchange="restoreBackup(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+
             <!-- STATISTIKY -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700 grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
                 <div class="bg-gray-900 p-3 rounded-2xl border border-gray-700">
@@ -54,7 +67,7 @@
                 <button onclick="saveAdCode()" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold">Uložit reklamu</button>
             </div>
 
-            <!-- 1. PŘIDAT ODKAZ S BANNEREM -->
+            <!-- PŘIDAT ODKAZ -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">🔗 Přidat nový odkaz a banner</h2>
                 <form onsubmit="addNewLink(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -65,48 +78,43 @@
                         <input type="file" id="l-banner-file" accept="image/*" required class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandBlue file:text-white">
                     </div>
                     <textarea id="l-desc" placeholder="Krátký popis odkazu..." class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
-                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit odkaz s bannerem do cloudu</button>
+                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit odkaz</button>
                 </form>
             </div>
-
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📋 Správa existujících odkazů</h2>
-                <div id="admin-links-list" class="space-y-2"><p class="text-xs text-gray-500">Načítám...</p></div>
+                <div id="admin-links-list" class="space-y-2"></div>
             </div>
 
-            <!-- 2. PŘIDAT ČLÁNEK -->
+            <!-- PŘIDAT ČLÁNEK -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📑 Přidat nový článek</h2>
                 <form onsubmit="addNewArticle(event)" class="space-y-3">
                     <input type="text" id="a-title" placeholder="Nadpis článku" required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
-                    <div>
-                        <label class="block text-[11px] text-gray-400 mb-1">Obsah článku:</label>
-                        <textarea id="a-text" placeholder="Napište text článku..." required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="4"></textarea>
-                    </div>
+                    <textarea id="a-text" placeholder="Napište text článku..." required class="w-full p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="4"></textarea>
                     <div class="flex flex-wrap gap-2">
-                        <button type="button" onclick="insertArticleLink()" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold">🔗 Vložit odkaz do textu</button>
+                        <button type="button" onclick="insertArticleLink()" class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold">🔗 Vložit odkaz</button>
                         <label class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer">
-                            <span>📷 Vložit obrázek z mobilu</span>
+                            <span>📷 Vložit obrázek</span>
                             <input type="file" id="a-inline-img" accept="image/*" class="hidden" onchange="insertArticleImage(this)">
                         </label>
                     </div>
-                    <button type="submit" class="bg-brandBlue text-white px-4 py-2.5 rounded-xl text-xs font-semibold w-full mt-2">Publikovat článek do cloudu</button>
+                    <button type="submit" class="bg-brandBlue text-white px-4 py-2.5 rounded-xl text-xs font-semibold w-full mt-2">Publikovat článek</button>
                 </form>
             </div>
-
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📋 Správa existujících článků</h2>
-                <div id="admin-articles-list" class="space-y-2"><p class="text-xs text-gray-500">Načítám...</p></div>
+                <div id="admin-articles-list" class="space-y-2"></div>
             </div>
 
-            <!-- 3. PŘIDAT PROFIL -->
+            <!-- PŘIDAT PROFIL -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">➕ Přidat nový profil herečky</h2>
                 <form onsubmit="addNewProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input type="text" id="p-name" placeholder="Jméno (např. ZAMBLI)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                     <input type="number" id="p-age" placeholder="Věk" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                     <input type="text" id="p-location" placeholder="Lokalita (např. Praha)" required class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
-                    <select id="p-hair" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white bg-gray-900">
+                    <select id="p-hair" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
                         <option value="blonde">Blond</option>
                         <option value="brunette">Brunetka</option>
                         <option value="redhead">Zrzka</option>
@@ -118,41 +126,28 @@
                     </div>
 
                     <div class="sm:col-span-2 bg-gray-900 p-3 rounded-xl border border-gray-700">
-                        <label class="block text-[11px] font-bold text-brandPink mb-1">Fotografie do galerie (můžete vybrat více fotek najednou):</label>
+                        <label class="block text-[11px] font-bold text-brandPink mb-1">Fotografie do galerie (více fotek najednou):</label>
                         <input type="file" id="p-gallery-files" accept="image/*" multiple required class="w-full text-xs text-gray-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brandPink file:text-white">
                     </div>
 
                     <textarea id="p-bio" placeholder="Biografie / popis..." required class="sm:col-span-2 p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white" rows="2"></textarea>
-                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit profil do cloudu</button>
+                    <button type="submit" class="sm:col-span-2 bg-brandPink text-white py-2.5 rounded-xl font-semibold text-xs shadow">Uložit profil</button>
                 </form>
             </div>
-
-            <!-- SPRÁVA PROFILŮ -->
             <div class="bg-gray-800 p-5 rounded-3xl border border-gray-700">
                 <h2 class="text-base font-bold mb-3">📋 Správa existujících profilů</h2>
-                <div id="admin-profiles-list" class="space-y-2"><p class="text-xs text-gray-500">Načítám...</p></div>
+                <div id="admin-profiles-list" class="space-y-2"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // === ZDE VLOŽ SVÉ ÚDAJE ZE SUPABASE ===
-        const rawUrl = 'https://tve-url.supabase.co';
-        const rawKey = 'tver-anon-klic';
-        
-        // Automatické očištění od případných skrytých znaků z mobilní klávesnice
-        const SUPABASE_URL = rawUrl.replace(/[^\x20-\x7E]/g, '').trim();
-        const SUPABASE_ANON_KEY = rawKey.replace(/[^\x20-\x7E]/g, '').trim();
+        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [];
+        let articles = JSON.parse(localStorage.getItem('ch_articles')) || [];
+        let externalLinks = JSON.parse(localStorage.getItem('ch_links')) || [];
+        let adCode = localStorage.getItem('ch_adcode') || '';
 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let profiles = [];
-        let articles = [];
-        let externalLinks = [];
-        let adCode = '';
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadFromCloud();
+        document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('stat-profiles').innerText = profiles.length;
             document.getElementById('stat-articles').innerText = articles.length;
             document.getElementById('stat-links').innerText = externalLinks.length;
@@ -163,41 +158,48 @@
             renderAdminLinks();
         });
 
-        async function loadFromCloud() {
-            try {
-                const { data, error } = await supabaseClient.from('app_store').select('*');
-                if (error) {
-                    console.error("Chyba při čtení ze Supabase:", error);
-                    return;
-                }
-                if (data) {
-                    data.forEach(row => {
-                        if (row.key === 'ch_profiles') profiles = row.value || [];
-                        if (row.key === 'ch_articles') articles = row.value || [];
-                        if (row.key === 'ch_links') externalLinks = row.value || [];
-                        if (row.key === 'ch_adcode') adCode = row.value || '';
-                    });
-                }
-            } catch (err) {
-                console.error("Chyba načítání z cloudu:", err);
-            }
+        // Zálohovací funkce
+        function downloadBackup() {
+            const backupData = {
+                profiles,
+                articles,
+                externalLinks,
+                adCode,
+                guestbook: JSON.parse(localStorage.getItem('ch_guestbook')) || []
+            };
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ceske-holky-zaloha-' + new Date().toISOString().slice(0,10) + '.json';
+            a.click();
         }
 
-        async function saveToCloud(key, value) {
-            const { error } = await supabaseClient
-                .from('app_store')
-                .upsert({ key: key, value: value }, { onConflict: 'key' });
-
-            if (error) {
-                alert("Uložení selhalo: " + error.message);
-                throw error;
-            }
+        function restoreBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.profiles) localStorage.setItem('ch_profiles', JSON.stringify(data.profiles));
+                    if (data.articles) localStorage.setItem('ch_articles', JSON.stringify(data.articles));
+                    if (data.externalLinks) localStorage.setItem('ch_links', JSON.stringify(data.externalLinks));
+                    if (data.adCode) localStorage.setItem('ch_adcode', data.adCode);
+                    if (data.guestbook) localStorage.setItem('ch_guestbook', JSON.stringify(data.guestbook));
+                    alert('Záloha byla úspěšně obnovena!');
+                    location.reload();
+                } catch(err) {
+                    alert('Chyba při čtení záložního souboru!');
+                }
+            };
+            reader.readAsText(file);
         }
 
-        async function saveAdCode() {
+        function saveAdCode() {
             adCode = document.getElementById('admin-ad-code').value;
-            await saveToCloud('ch_adcode', adCode);
-            alert('Reklamní kód byl uložen do cloudu!');
+            localStorage.setItem('ch_adcode', adCode);
+            alert('Reklamní kód byl uložen!');
         }
 
         function resizeImage(file, maxWidth, maxHeight, callback) {
@@ -228,59 +230,47 @@
             e.preventDefault();
             const fileInput = document.getElementById('l-banner-file');
             if (fileInput.files && fileInput.files[0]) {
-                resizeImage(fileInput.files[0], 800, 600, async function(compressedImg) {
-                    try {
-                        externalLinks.push({
-                            id: Date.now(),
-                            title: document.getElementById('l-title').value,
-                            url: document.getElementById('l-url').value,
-                            banner: compressedImg,
-                            description: document.getElementById('l-desc').value
-                        });
-                        await saveToCloud('ch_links', externalLinks);
-                        alert('Odkaz byl úspěšně uložen do cloudu!');
-                        location.reload();
-                    } catch(err) {}
+                resizeImage(fileInput.files[0], 800, 600, function(compressedImg) {
+                    externalLinks.push({
+                        id: Date.now(),
+                        title: document.getElementById('l-title').value,
+                        url: document.getElementById('l-url').value,
+                        banner: compressedImg,
+                        description: document.getElementById('l-desc').value
+                    });
+                    localStorage.setItem('ch_links', JSON.stringify(externalLinks));
+                    alert('Odkaz byl uložen!');
+                    location.reload();
                 });
-            } else {
-                alert('Vyberte banner.');
             }
         }
 
         function renderAdminLinks() {
             const list = document.getElementById('admin-links-list');
-            if(!externalLinks || externalLinks.length === 0) {
-                list.innerHTML = '<p class="text-xs text-gray-500">Žádné odkazy.</p>';
-                return;
-            }
+            if(!externalLinks.length) { list.innerHTML = '<p class="text-xs text-gray-500">Žádné odkazy.</p>'; return; }
             list.innerHTML = externalLinks.map(l => `
                 <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
                     <div class="flex items-center space-x-2">
                         <img src="${l.banner}" class="w-10 h-8 rounded-lg object-cover">
-                        <div>
-                            <span class="font-bold text-white block">${l.title}</span>
-                            <a href="${l.url}" target="_blank" class="text-blue-400 text-[10px] underline">${l.url}</a>
-                        </div>
+                        <span class="font-bold text-white">${l.title}</span>
                     </div>
                     <button onclick="deleteLink(${l.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
                 </div>
             `).join('');
         }
 
-        async function deleteLink(id) {
-            if(confirm('Smazat odkaz?')) {
-                try {
-                    externalLinks = externalLinks.filter(l => l.id !== id);
-                    await saveToCloud('ch_links', externalLinks);
-                    renderAdminLinks();
-                } catch(err) {}
+        function deleteLink(id) {
+            if(confirm('Smazat?')) {
+                externalLinks = externalLinks.filter(l => l.id !== id);
+                localStorage.setItem('ch_links', JSON.stringify(externalLinks));
+                renderAdminLinks();
             }
         }
 
         function insertArticleLink() {
-            const url = prompt("Zadejte URL adresu odkazu:");
+            const url = prompt("URL adresa:");
             if (!url) return;
-            const text = prompt("Zadejte text odkazu:", url);
+            const text = prompt("Text odkazu:", url);
             document.getElementById('a-text').value += ` <a href="${url}" target="_blank" class="text-blue-400 underline font-semibold">${text || url}</a> `;
         }
 
@@ -288,63 +278,47 @@
             if (input.files && input.files[0]) {
                 resizeImage(input.files[0], 800, 800, function(compressedImg) {
                     document.getElementById('a-text').value += ` <br><img src="${compressedImg}" class="w-full rounded-2xl my-2 max-h-60 object-cover"><br> `;
-                    alert('Obrázek byl zmenšen a vložen do textu!');
+                    alert('Obrázek vložen!');
                 });
             }
         }
 
-        async function addNewArticle(e) {
+        function addNewArticle(e) {
             e.preventDefault();
-            try {
-                articles.unshift({
-                    id: Date.now(),
-                    title: document.getElementById('a-title').value,
-                    date: new Date().toLocaleDateString('cs-CZ'),
-                    content: document.getElementById('a-text').value.replace(/\n/g, '<br>')
-                });
-                await saveToCloud('ch_articles', articles);
-                alert('Článek byl publikován do cloudu!');
-                location.reload();
-            } catch(err) {}
+            articles.unshift({
+                id: Date.now(),
+                title: document.getElementById('a-title').value,
+                date: new Date().toLocaleDateString('cs-CZ'),
+                content: document.getElementById('a-text').value.replace(/\n/g, '<br>')
+            });
+            localStorage.setItem('ch_articles', JSON.stringify(articles));
+            alert('Článek publikován!');
+            location.reload();
         }
 
         function renderAdminArticles() {
             const list = document.getElementById('admin-articles-list');
-            if(!articles || articles.length === 0) {
-                list.innerHTML = '<p class="text-xs text-gray-500">Žádné články.</p>';
-                return;
-            }
+            if(!articles.length) { list.innerHTML = '<p class="text-xs text-gray-500">Žádné články.</p>'; return; }
             list.innerHTML = articles.map(a => `
                 <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
-                    <span class="font-bold text-white">${a.title} (${a.date})</span>
+                    <span class="font-bold text-white">${a.title}</span>
                     <button onclick="deleteArticle(${a.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
                 </div>
             `).join('');
         }
 
-        async function deleteArticle(id) {
-            if(confirm('Smazat článek?')) {
-                try {
-                    articles = articles.filter(a => a.id !== id);
-                    await saveToCloud('ch_articles', articles);
-                    renderAdminArticles();
-                } catch(err) {}
+        function deleteArticle(id) {
+            if(confirm('Smazat?')) {
+                articles = articles.filter(a => a.id !== id);
+                localStorage.setItem('ch_articles', JSON.stringify(articles));
+                renderAdminArticles();
             }
         }
 
-        async function addNewProfile(e) {
+        function addNewProfile(e) {
             e.preventDefault();
             const profileImgInput = document.getElementById('p-profile-img');
             const galleryInput = document.getElementById('p-gallery-files');
-
-            if (!profileImgInput.files || !profileImgInput.files[0]) {
-                alert('Vyberte hlavní profilový obrázek.');
-                return;
-            }
-            if (!galleryInput.files || galleryInput.files.length === 0) {
-                alert('Vyberte alespoň jednu fotku do galerie.');
-                return;
-            }
 
             resizeImage(profileImgInput.files[0], 600, 800, function(compressedProfileImg) {
                 let galleryUrls = [];
@@ -352,27 +326,24 @@
                 const galleryFiles = Array.from(galleryInput.files);
 
                 galleryFiles.forEach((file, index) => {
-                    resizeImage(file, 800, 1000, async function(compressedGalleryImg) {
+                    resizeImage(file, 800, 1000, function(compressedGalleryImg) {
                         galleryUrls[index] = compressedGalleryImg;
                         filesLoaded++;
-
                         if (filesLoaded === galleryFiles.length) {
-                            try {
-                                profiles.push({
-                                    id: Date.now(),
-                                    name: document.getElementById('p-name').value.toUpperCase(),
-                                    age: parseInt(document.getElementById('p-age').value),
-                                    location: document.getElementById('p-location').value,
-                                    hair: document.getElementById('p-hair').value,
-                                    profileImage: compressedProfileImg,
-                                    gallery: galleryUrls,
-                                    bio: document.getElementById('p-bio').value,
-                                    createdAt: Date.now()
-                                });
-                                await saveToCloud('ch_profiles', profiles);
-                                alert('Profil a galerie byly uloženy do cloudu!');
-                                location.reload();
-                            } catch(err) {}
+                            profiles.push({
+                                id: Date.now(),
+                                name: document.getElementById('p-name').value.toUpperCase(),
+                                age: parseInt(document.getElementById('p-age').value),
+                                location: document.getElementById('p-location').value,
+                                hair: document.getElementById('p-hair').value,
+                                profileImage: compressedProfileImg,
+                                gallery: galleryUrls,
+                                bio: document.getElementById('p-bio').value,
+                                createdAt: Date.now()
+                            });
+                            localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+                            alert('Profil uložen!');
+                            location.reload();
                         }
                     });
                 });
@@ -381,32 +352,20 @@
 
         function renderAdminProfiles() {
             const list = document.getElementById('admin-profiles-list');
-            if(!profiles || profiles.length === 0) {
-                list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily v databázi.</p>';
-                return;
-            }
-            list.innerHTML = profiles.map(p => {
-                const cover = p.profileImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
-                const count = p.gallery ? p.gallery.length : 0;
-                return `
-                    <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
-                        <div class="flex items-center space-x-2">
-                            <img src="${cover}" class="w-8 h-8 rounded-lg object-cover">
-                            <span class="font-bold text-white">${p.name} (${count} fotek v galerii)</span>
-                        </div>
-                        <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
-                    </div>
-                `;
-            }).join('');
+            if(!profiles.length) { list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily.</p>'; return; }
+            list.innerHTML = profiles.map(p => `
+                <div class="flex items-center justify-between bg-gray-900 p-2.5 rounded-xl border border-gray-700 text-xs">
+                    <span class="font-bold text-white">${p.name}</span>
+                    <button onclick="deleteProfile(${p.id})" class="bg-red-500/20 text-red-400 px-2.5 py-1 rounded-lg">Smazat</button>
+                </div>
+            `).join('');
         }
 
-        async function deleteProfile(id) {
-            if(confirm('Opravdu smazat tento profil?')) {
-                try {
-                    profiles = profiles.filter(p => p.id !== id);
-                    await saveToCloud('ch_profiles', profiles);
-                    renderAdminProfiles();
-                } catch(err) {}
+        function deleteProfile(id) {
+            if(confirm('Smazat?')) {
+                profiles = profiles.filter(p => p.id !== id);
+                localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+                renderAdminProfiles();
             }
         }
     </script>
