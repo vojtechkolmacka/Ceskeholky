@@ -25,7 +25,7 @@
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
                 <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace (Cloud)</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Připojeno k Supabase databázi</p>
+                <p class="text-xs text-gray-400 mt-0.5">Diagnostický režim připojení</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
@@ -136,10 +136,14 @@
     </div>
 
     <script>
-        // === NASTAVENÍ SUPABASE (ZDE UPRAV SVOJE ÚDAJE) ===
+        // === ZKONTROLUJ SI TYTO DVA ÚDAJE ZE SUPABASE ===
         const SUPABASE_URL = 'VASE_SUPABASE_URL';
         const SUPABASE_ANON_KEY = 'VASE_SUPABASE_ANON_KEY';
         
+        if (SUPABASE_URL.includes('VASE_')) {
+            alert('CHYBA: V souboru admin.html nemáš vyplněné reálné Supabase klíče! Jsou tam ještě výchozí texty VASE_SUPABASE_URL.');
+        }
+
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let profiles = [];
@@ -163,7 +167,7 @@
             try {
                 const { data, error } = await supabaseClient.from('app_store').select('*');
                 if (error) {
-                    console.error("Chyba při čtení ze Supabase:", error);
+                    alert("Chyba při čtení ze Supabase: " + error.message);
                     return;
                 }
                 if (data) {
@@ -175,25 +179,18 @@
                     });
                 }
             } catch (err) {
-                console.error("Chyba načítání z cloudu:", err);
+                alert("Chyba připojení k Supabase cloudu: " + err.message);
             }
         }
 
-        // Vylepšená funkce pro zápis s ochranou proti chybám
         async function saveToCloud(key, value) {
-            try {
-                const { error } = await supabaseClient
-                    .from('app_store')
-                    .upsert({ key: key, value: value }, { onConflict: 'key' });
+            const { error } = await supabaseClient
+                .from('app_store')
+                .upsert({ key: key, value: value }, { onConflict: 'key' });
 
-                if (error) {
-                    console.error("Supabase upsert error:", error);
-                    alert("Chyba databáze Supabase: " + error.message);
-                    throw error;
-                }
-            } catch (err) {
-                console.error("Chyba při ukládání do cloudu:", err);
-                throw err;
+            if (error) {
+                alert("ULOŽENÍ SELHALO! Supabase hlásí: " + error.message);
+                throw error;
             }
         }
 
@@ -203,7 +200,6 @@
             alert('Reklamní kód byl uložen do cloudu!');
         }
 
-        // Komprese obrázků
         function resizeImage(file, maxWidth, maxHeight, callback) {
             const reader = new FileReader();
             reader.onload = function (e) {
@@ -228,22 +224,23 @@
             reader.readAsDataURL(file);
         }
 
-        // ODKAZY
         async function addNewLink(e) {
             e.preventDefault();
             const fileInput = document.getElementById('l-banner-file');
             if (fileInput.files && fileInput.files[0]) {
                 resizeImage(fileInput.files[0], 800, 600, async function(compressedImg) {
-                    externalLinks.push({
-                        id: Date.now(),
-                        title: document.getElementById('l-title').value,
-                        url: document.getElementById('l-url').value,
-                        banner: compressedImg,
-                        description: document.getElementById('l-desc').value
-                    });
-                    await saveToCloud('ch_links', externalLinks);
-                    alert('Odkaz byl úspěšně uložen do cloudu!');
-                    location.reload();
+                    try {
+                        externalLinks.push({
+                            id: Date.now(),
+                            title: document.getElementById('l-title').value,
+                            url: document.getElementById('l-url').value,
+                            banner: compressedImg,
+                            description: document.getElementById('l-desc').value
+                        });
+                        await saveToCloud('ch_links', externalLinks);
+                        alert('Odkaz byl úspěšně uložen do cloudu!');
+                        location.reload();
+                    } catch(err) {}
                 });
             } else {
                 alert('Vyberte banner.');
@@ -272,13 +269,14 @@
 
         async function deleteLink(id) {
             if(confirm('Smazat odkaz?')) {
-                externalLinks = externalLinks.filter(l => l.id !== id);
-                await saveToCloud('ch_links', externalLinks);
-                renderAdminLinks();
+                try {
+                    externalLinks = externalLinks.filter(l => l.id !== id);
+                    await saveToCloud('ch_links', externalLinks);
+                    renderAdminLinks();
+                } catch(err) {}
             }
         }
 
-        // ČLÁNKY
         function insertArticleLink() {
             const url = prompt("Zadejte URL adresu odkazu:");
             if (!url) return;
@@ -297,15 +295,17 @@
 
         async function addNewArticle(e) {
             e.preventDefault();
-            articles.unshift({
-                id: Date.now(),
-                title: document.getElementById('a-title').value,
-                date: new Date().toLocaleDateString('cs-CZ'),
-                content: document.getElementById('a-text').value.replace(/\n/g, '<br>')
-            });
-            await saveToCloud('ch_articles', articles);
-            alert('Článek byl publikován do cloudu!');
-            location.reload();
+            try {
+                articles.unshift({
+                    id: Date.now(),
+                    title: document.getElementById('a-title').value,
+                    date: new Date().toLocaleDateString('cs-CZ'),
+                    content: document.getElementById('a-text').value.replace(/\n/g, '<br>')
+                });
+                await saveToCloud('ch_articles', articles);
+                alert('Článek byl publikován do cloudu!');
+                location.reload();
+            } catch(err) {}
         }
 
         function renderAdminArticles() {
@@ -324,13 +324,14 @@
 
         async function deleteArticle(id) {
             if(confirm('Smazat článek?')) {
-                articles = articles.filter(a => a.id !== id);
-                await saveToCloud('ch_articles', articles);
-                renderAdminArticles();
+                try {
+                    articles = articles.filter(a => a.id !== id);
+                    await saveToCloud('ch_articles', articles);
+                    renderAdminArticles();
+                } catch(err) {}
             }
         }
 
-        // PROFILY
         async function addNewProfile(e) {
             e.preventDefault();
             const profileImgInput = document.getElementById('p-profile-img');
@@ -356,20 +357,22 @@
                         filesLoaded++;
 
                         if (filesLoaded === galleryFiles.length) {
-                            profiles.push({
-                                id: Date.now(),
-                                name: document.getElementById('p-name').value.toUpperCase(),
-                                age: parseInt(document.getElementById('p-age').value),
-                                location: document.getElementById('p-location').value,
-                                hair: document.getElementById('p-hair').value,
-                                profileImage: compressedProfileImg,
-                                gallery: galleryUrls,
-                                bio: document.getElementById('p-bio').value,
-                                createdAt: Date.now()
-                            });
-                            await saveToCloud('ch_profiles', profiles);
-                            alert('Profil a galerie byly uloženy do cloudu!');
-                            location.reload();
+                            try {
+                                profiles.push({
+                                    id: Date.now(),
+                                    name: document.getElementById('p-name').value.toUpperCase(),
+                                    age: parseInt(document.getElementById('p-age').value),
+                                    location: document.getElementById('p-location').value,
+                                    hair: document.getElementById('p-hair').value,
+                                    profileImage: compressedProfileImg,
+                                    gallery: galleryUrls,
+                                    bio: document.getElementById('p-bio').value,
+                                    createdAt: Date.now()
+                                });
+                                await saveToCloud('ch_profiles', profiles);
+                                alert('Profil a galerie byly uloženy do cloudu!');
+                                location.reload();
+                            } catch(err) {}
                         }
                     });
                 });
@@ -399,9 +402,11 @@
 
         async function deleteProfile(id) {
             if(confirm('Opravdu smazat tento profil?')) {
-                profiles = profiles.filter(p => p.id !== id);
-                await saveToCloud('ch_profiles', profiles);
-                renderAdminProfiles();
+                try {
+                    profiles = profiles.filter(p => p.id !== id);
+                    await saveToCloud('ch_profiles', profiles);
+                    renderAdminProfiles();
+                } catch(err) {}
             }
         }
     </script>
