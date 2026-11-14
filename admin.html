@@ -169,77 +169,42 @@
     </div>
 
     <script>
-        let profiles = [];
-        let articles = [];
-        let externalLinks = [];
-        let adCode = '';
-        let guestbook = [];
-        let bannerPc = '';
-        let bannerMobil = '';
+        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [];
+        let articles = JSON.parse(localStorage.getItem('ch_articles')) || [];
+        let externalLinks = JSON.parse(localStorage.getItem('ch_links')) || [];
+        let adCode = localStorage.getItem('ch_adcode') || '';
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('stat-profiles').innerText = profiles.length;
+            document.getElementById('stat-articles').innerText = articles.length;
+            document.getElementById('stat-links').innerText = externalLinks.length;
+            if(adCode) document.getElementById('admin-ad-code').value = adCode;
+
+            // Načtení uložených GitHub údajů do inputů
             if(localStorage.getItem('gh_owner')) document.getElementById('gh-owner').value = localStorage.getItem('gh_owner');
             if(localStorage.getItem('gh_repo')) document.getElementById('gh-repo').value = localStorage.getItem('gh_repo');
             if(localStorage.getItem('gh_token')) document.getElementById('gh-token').value = localStorage.getItem('gh_token');
 
-            await loadDataFromGitHub();
-        });
-
-        async function loadDataFromGitHub() {
-            const owner = localStorage.getItem('gh_owner');
-            const repo = localStorage.getItem('gh_repo');
-            const token = localStorage.getItem('gh_token');
-
-            if (!owner || !repo || !token) return;
-
-            try {
-                const url = `https://api.github.com/repos/${owner}/${repo}/contents/data.json`;
-                const res = await fetch(url, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' }
-                });
-                if (res.ok) {
-                    const fileData = await res.json();
-                    const jsonString = decodeURIComponent(escape(atob(fileData.content)));
-                    const data = JSON.parse(jsonString);
-                    
-                    profiles = data.profiles || [];
-                    articles = data.articles || [];
-                    externalLinks = data.externalLinks || [];
-                    adCode = data.adCode || '';
-                    guestbook = data.guestbook || [];
-                    bannerPc = data.bannerPc || '';
-                    bannerMobil = data.bannerMobil || '';
-
-                    if(adCode) document.getElementById('admin-ad-code').value = adCode;
-                }
-            } catch (err) {
-                console.error("Nepodařilo se načíst data z GitHubu:", err);
-            }
-
-            document.getElementById('stat-profiles').innerText = profiles.length;
-            document.getElementById('stat-articles').innerText = articles.length;
-            document.getElementById('stat-links').innerText = externalLinks.length;
-
             renderAdminProfiles();
             renderAdminArticles();
             renderAdminLinks();
-        }
+        });
 
         function saveGitHubSettings() {
             localStorage.setItem('gh_owner', document.getElementById('gh-owner').value.trim());
             localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim());
             localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
-            alert('GitHub nastavení uloženo! Nyní se stahují data...');
-            loadDataFromGitHub();
+            alert('GitHub nastavení bylo uloženo!');
         }
 
+        // AUTOMATICKÉ ODESLÁNÍ DATA.JSON PŘES GITHUB API
         async function commitAndPushData(successMessage) {
             const owner = localStorage.getItem('gh_owner');
             const repo = localStorage.getItem('gh_repo');
             const token = localStorage.getItem('gh_token');
 
             if (!owner || !repo || !token) {
-                alert('Nejprve nahoře vyplň a ulož své GitHub údaje (Owner, Repozitář a Token)!');
+                alert('Před uložením prosím nahoře vyplň a ulož své GitHub údaje (Owner, Repozitář a Token)!');
                 return;
             }
 
@@ -248,18 +213,24 @@
                 articles,
                 externalLinks,
                 adCode,
-                guestbook,
-                bannerPc,
-                bannerMobil
+                guestbook: JSON.parse(localStorage.getItem('ch_guestbook')) || [],
+                bannerPc: localStorage.getItem('ch_banner_pc') || '',
+                bannerMobil: localStorage.getItem('ch_banner_mobil') || ''
             };
+
+            // Lokální uložení
+            localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+            localStorage.setItem('ch_articles', JSON.stringify(articles));
+            localStorage.setItem('ch_links', JSON.stringify(externalLinks));
+            localStorage.setItem('ch_adcode', adCode);
 
             const path = 'data.json';
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            
-            try {
-                const jsonString = JSON.stringify(backupData, null, 2);
-                const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
+            const jsonString = JSON.stringify(backupData, null, 2);
+            const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
 
+            try {
+                // 1. Zjistit SHA existujícího souboru
                 let sha = null;
                 const getRes = await fetch(url, {
                     headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' }
@@ -269,6 +240,7 @@
                     sha = fileData.sha;
                 }
 
+                // 2. Odeslat nový soubor na GitHub
                 const putRes = await fetch(url, {
                     method: 'PUT',
                     headers: {
@@ -284,34 +256,34 @@
                 });
 
                 if (putRes.ok) {
-                    alert(successMessage + ' Uloženo na GitHub!');
+                    alert(successMessage + '\n\nZměny byly úspěšně odeslány přímo na GitHub!');
                     location.reload();
                 } else {
                     const errData = await putRes.json();
-                    alert('Chyba GitHubu: ' + (errData.message || 'Neznámá chyba'));
+                    alert('Chyba při odesílání na GitHub: ' + (errData.message || 'Neznámá chyba'));
                 }
             } catch (err) {
-                alert('Chyba při odesílání. Fotky jsou pravděpodobně moc velké, zkus nahrát menší.');
+                alert('Chyba sítě při komunikaci s GitHub API.');
                 console.error(err);
             }
         }
 
         function saveAdCode() {
             adCode = document.getElementById('admin-ad-code').value;
-            commitAndPushData('Reklama uložena.');
+            localStorage.setItem('ch_adcode', adCode);
+            commitAndPushData('Reklama byla uložena.');
         }
 
         function saveSiteBanner(type) {
             const inputId = type === 'pc' ? 'banner-pc-file' : 'banner-mobil-file';
             const fileInput = document.getElementById(inputId);
             if (!fileInput.files || !fileInput.files[0]) {
-                alert('Vyber obrázek banneru.');
+                alert('Vyberte obrázek banneru.');
                 return;
             }
             resizeImage(fileInput.files[0], 1200, 600, function(compressedImg) {
-                if (type === 'pc') bannerPc = compressedImg;
-                else bannerMobil = compressedImg;
-                commitAndPushData('Banner aktualizován.');
+                localStorage.setItem(type === 'pc' ? 'ch_banner_pc' : 'ch_banner_mobil', compressedImg);
+                commitAndPushData('Banner byl aktualizován.');
             });
         }
 
@@ -355,7 +327,7 @@
                 } else {
                     externalLinks.push({ id: Date.now(), title, url, description: desc, banner: bannerUrl || '' });
                 }
-                commitAndPushData('Odkaz uložen.');
+                commitAndPushData('Odkaz byl uložen.');
             };
 
             if (fileInput.files && fileInput.files[0]) {
@@ -405,7 +377,7 @@
         function deleteLink(id) {
             if(confirm('Smazat?')) {
                 externalLinks = externalLinks.filter(l => l.id !== id);
-                commitAndPushData('Odkaz smazán.');
+                commitAndPushData('Odkaz byl smazán.');
             }
         }
 
@@ -438,7 +410,7 @@
             } else {
                 articles.unshift({ id: Date.now(), title, date: new Date().toLocaleDateString('cs-CZ'), content });
             }
-            commitAndPushData('Článek uložen.');
+            commitAndPushData('Článek byl uložen.');
         }
 
         function editArticle(id) {
@@ -477,7 +449,7 @@
         function deleteArticle(id) {
             if(confirm('Smazat?')) {
                 articles = articles.filter(a => a.id !== id);
-                commitAndPushData('Článek smazán.');
+                commitAndPushData('Článek byl smazán.');
             }
         }
 
@@ -508,7 +480,7 @@
                         profileImage: coverImg || '', gallery: newGallery, createdAt: Date.now()
                     });
                 }
-                commitAndPushData('Profil uložen.');
+                commitAndPushData('Profil byl uložen.');
             };
 
             const processGalleryAndSave = (cover) => {
@@ -564,6 +536,7 @@
         function renderAdminProfiles() {
             const list = document.getElementById('admin-profiles-list');
             if(!profiles.length) { list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily.</p>'; return; }
+            list.setItem = [];
             list.innerHTML = profiles.map(p => {
                 const cover = p.profileImage || (p.gallery && p.gallery[0] ? p.gallery[0] : '');
                 return `
@@ -584,7 +557,7 @@
         function deleteProfile(id) {
             if(confirm('Smazat?')) {
                 profiles = profiles.filter(p => p.id !== id);
-                commitAndPushData('Profil smazán.');
+                commitAndPushData('Profil byl smazán.');
             }
         }
     </script>
