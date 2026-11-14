@@ -23,20 +23,20 @@
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
                 <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace – Plná správa</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Upravuj, přidávej a spravuj veškerý obsah webu</p>
+                <p class="text-xs text-gray-400 mt-0.5">Po každé změně se automaticky stáhne data.json pro GitHub</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
 
         <div class="space-y-6">
-            <!-- ZÁLOHOVÁNÍ DAT -->
+            <!-- ZÁLOHOVÁNÍ A GITHUB SYNC -->
             <div class="bg-gradient-to-r from-blue-900/40 to-purple-900/40 p-5 rounded-3xl border border-blue-500/30">
-                <h2 class="text-base font-bold mb-1 text-white">💾 Bezpečnostní záloha dat</h2>
-                <p class="text-xs text-gray-300 mb-4">Stáhni si zálohu do telefonu nebo ji kdykoliv obnov ze souboru.</p>
+                <h2 class="text-base font-bold mb-1 text-white">💾 GitHub Synchronizace dat</h2>
+                <p class="text-xs text-gray-300 mb-4">Po každém uložení čehokoliv se ti automaticky stáhne soubor `data.json`. Ten stačí nahrát na GitHub do stejné složky jako index.html a změny budou trvale uloženy pro všechny!</p>
                 <div class="flex flex-wrap gap-3">
-                    <button onclick="downloadBackup()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow">📥 Stáhnout zálohu dat (.json)</button>
+                    <button onclick="exportAndDownloadData('Ručně stažený soubor data.json')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow">📥 Stáhnout data.json ručně</button>
                     <label class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow cursor-pointer">
-                        <span>📤 Obnovit ze zálohy</span>
+                        <span>📤 Obnovit ze zálohy (.json)</span>
                         <input type="file" accept=".json" onchange="restoreBackup(event)" class="hidden">
                     </label>
                 </div>
@@ -187,21 +187,37 @@
             renderAdminLinks();
         });
 
-        // Zálohovací funkce
-        function downloadBackup() {
+        // HLAVNÍ FUNKCE PRO ULOŽENÍ A AUTOMATICKÉ STAŽENÍ DATA.JSON
+        function exportAndDownloadData(successMessage) {
             const backupData = {
                 profiles,
                 articles,
                 externalLinks,
                 adCode,
-                guestbook: JSON.parse(localStorage.getItem('ch_guestbook')) || []
+                guestbook: JSON.parse(localStorage.getItem('ch_guestbook')) || [],
+                bannerPc: localStorage.getItem('ch_banner_pc') || '',
+                bannerMobil: localStorage.getItem('ch_banner_mobil') || ''
             };
+
+            // Uložení do lokální paměti prohlížeče
+            localStorage.setItem('ch_profiles', JSON.stringify(profiles));
+            localStorage.setItem('ch_articles', JSON.stringify(articles));
+            localStorage.setItem('ch_links', JSON.stringify(externalLinks));
+            localStorage.setItem('ch_adcode', adCode);
+
+            // Automatické vygenerování a stažení data.json
             const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'ceske-holky-zaloha-' + new Date().toISOString().slice(0,10) + '.json';
+            a.download = 'data.json';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert(successMessage + '\n\nSoubor data.json byl stažen do vašeho zařízení. Nahrajte ho na GitHub!');
+            location.reload();
         }
 
         function restoreBackup(event) {
@@ -216,6 +232,8 @@
                     if (data.externalLinks) localStorage.setItem('ch_links', JSON.stringify(data.externalLinks));
                     if (data.adCode) localStorage.setItem('ch_adcode', data.adCode);
                     if (data.guestbook) localStorage.setItem('ch_guestbook', JSON.stringify(data.guestbook));
+                    if (data.bannerPc) localStorage.setItem('ch_banner_pc', data.bannerPc);
+                    if (data.bannerMobil) localStorage.setItem('ch_banner_mobil', data.bannerMobil);
                     alert('Záloha byla úspěšně obnovena!');
                     location.reload();
                 } catch(err) {
@@ -228,7 +246,7 @@
         function saveAdCode() {
             adCode = document.getElementById('admin-ad-code').value;
             localStorage.setItem('ch_adcode', adCode);
-            alert('Reklamní kód byl uložen!');
+            exportAndDownloadData('Reklama byla uložena.');
         }
 
         function saveSiteBanner(type) {
@@ -240,8 +258,7 @@
             }
             resizeImage(fileInput.files[0], 1200, 600, function(compressedImg) {
                 localStorage.setItem(type === 'pc' ? 'ch_banner_pc' : 'ch_banner_mobil', compressedImg);
-                alert('Banner byl úspěšně aktualizován!');
-                location.reload();
+                exportAndDownloadData('Banner byl aktualizován.');
             });
         }
 
@@ -294,9 +311,7 @@
                         banner: bannerUrl || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80'
                     });
                 }
-                localStorage.setItem('ch_links', JSON.stringify(externalLinks));
-                alert('Odkaz byl uložen!');
-                location.reload();
+                exportAndDownloadData('Odkaz byl uložen.');
             };
 
             if (fileInput.files && fileInput.files[0]) {
@@ -348,8 +363,7 @@
         function deleteLink(id) {
             if(confirm('Smazat?')) {
                 externalLinks = externalLinks.filter(l => l.id !== id);
-                localStorage.setItem('ch_links', JSON.stringify(externalLinks));
-                renderAdminLinks();
+                exportAndDownloadData('Odkaz byl smazán.');
             }
         }
 
@@ -390,9 +404,7 @@
                     content
                 });
             }
-            localStorage.setItem('ch_articles', JSON.stringify(articles));
-            alert('Článek uložen!');
-            location.reload();
+            exportAndDownloadData('Článek byl uložen.');
         }
 
         function editArticle(id) {
@@ -432,8 +444,7 @@
         function deleteArticle(id) {
             if(confirm('Smazat?')) {
                 articles = articles.filter(a => a.id !== id);
-                localStorage.setItem('ch_articles', JSON.stringify(articles));
-                renderAdminArticles();
+                exportAndDownloadData('Článek byl smazán.');
             }
         }
 
@@ -473,12 +484,9 @@
                         createdAt: Date.now()
                     });
                 }
-                localStorage.setItem('ch_profiles', JSON.stringify(profiles));
-                alert('Profil byl úspěšně uložen!');
-                location.reload();
+                exportAndDownloadData('Profil byl úspěšně uložen.');
             };
 
-            // Zpracování obrázků
             const processGalleryAndSave = (cover) => {
                 let galleryUrls = [];
                 let filesLoaded = 0;
@@ -556,8 +564,7 @@
         function deleteProfile(id) {
             if(confirm('Smazat?')) {
                 profiles = profiles.filter(p => p.id !== id);
-                localStorage.setItem('ch_profiles', JSON.stringify(profiles));
-                renderAdminProfiles();
+                exportAndDownloadData('Profil byl smazán.');
             }
         }
     </script>
