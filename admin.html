@@ -136,9 +136,9 @@
     </div>
 
     <script>
-        // === ZDE DOSAZ SVÉ ÚDAJE ZE SUPABASE ===
-        const SUPABASE_URL = 'https://tvůj-projekt.supabase.co';
-        const SUPABASE_ANON_KEY = 'tvůj-anon-klíč...';
+        // === ZDE VLOŽ SVÉ ÚDAJE ZE SUPABASE (mezery a odřádkování se automaticky oříznou) ===
+        const SUPABASE_URL = 'https://tvůj-projekt.supabase.co'.trim();
+        const SUPABASE_ANON_KEY = 'tvůj-anon-klíč...'.trim();
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -381,7 +381,7 @@
                 list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily v databázi.</p>';
                 return;
             }
-            list.innerHTML = profiles.profiles ? '' : profiles.map(p => {
+            list.innerHTML = profiles.map(p => {
                 const cover = p.profileImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
                 const count = p.gallery ? p.gallery.length : 0;
                 return `
