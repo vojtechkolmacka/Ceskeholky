@@ -25,7 +25,7 @@
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
                 <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace (Cloud)</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Diagnostický režim připojení</p>
+                <p class="text-xs text-gray-400 mt-0.5">Připojeno k Supabase databázi</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
@@ -136,14 +136,10 @@
     </div>
 
     <script>
-        // === ZKONTROLUJ SI TYTO DVA ÚDAJE ZE SUPABASE ===
-        const SUPABASE_URL = 'VASE_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'VASE_SUPABASE_ANON_KEY';
+        // === ZDE DOSAZ SVÉ ÚDAJE ZE SUPABASE ===
+        const SUPABASE_URL = 'https://tvůj-projekt.supabase.co';
+        const SUPABASE_ANON_KEY = 'tvůj-anon-klíč...';
         
-        if (SUPABASE_URL.includes('VASE_')) {
-            alert('CHYBA: V souboru admin.html nemáš vyplněné reálné Supabase klíče! Jsou tam ještě výchozí texty VASE_SUPABASE_URL.');
-        }
-
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let profiles = [];
@@ -167,7 +163,7 @@
             try {
                 const { data, error } = await supabaseClient.from('app_store').select('*');
                 if (error) {
-                    alert("Chyba při čtení ze Supabase: " + error.message);
+                    console.error("Chyba při čtení ze Supabase:", error);
                     return;
                 }
                 if (data) {
@@ -179,7 +175,7 @@
                     });
                 }
             } catch (err) {
-                alert("Chyba připojení k Supabase cloudu: " + err.message);
+                console.error("Chyba načítání z cloudu:", err);
             }
         }
 
@@ -189,7 +185,7 @@
                 .upsert({ key: key, value: value }, { onConflict: 'key' });
 
             if (error) {
-                alert("ULOŽENÍ SELHALO! Supabase hlásí: " + error.message);
+                alert("Uložení selhalo: " + error.message);
                 throw error;
             }
         }
@@ -385,7 +381,7 @@
                 list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily v databázi.</p>';
                 return;
             }
-            list.innerHTML = profiles.map(p => {
+            list.innerHTML = profiles.profiles ? '' : profiles.map(p => {
                 const cover = p.profileImage || (p.gallery && p.gallery.length > 0 ? p.gallery[0] : '');
                 const count = p.gallery ? p.gallery.length : 0;
                 return `
