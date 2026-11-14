@@ -136,10 +136,14 @@
     </div>
 
     <script>
-        // === SEM VLOZ SVÉ UDAJE ZE SUPABASE (bez diakritiky) ===
-        const SUPABASE_URL = 'https://xyxyxyxyxy.supabase.co'.trim();
-        const SUPABASE_ANON_KEY = 'eyJhbGciOi...'.trim();
+        // === ZDE VLOŽ SVÉ ÚDAJE ZE SUPABASE ===
+        const rawUrl = 'https://tve-url.supabase.co';
+        const rawKey = 'tver-anon-klic';
         
+        // Automatické očištění od případných skrytých znaků z mobilní klávesnice
+        const SUPABASE_URL = rawUrl.replace(/[^\x20-\x7E]/g, '').trim();
+        const SUPABASE_ANON_KEY = rawKey.replace(/[^\x20-\x7E]/g, '').trim();
+
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let profiles = [];
