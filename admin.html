@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PWA Administrace – Přímý GitHub Sync</title>
+    <title>PWA Administrace – Manuální GitHub Backup</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -22,23 +22,24 @@
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-6 bg-gray-800 p-5 rounded-3xl border border-gray-700 shadow-xl">
             <div>
-                <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace – GitHub API</h1>
-                <p class="text-xs text-gray-400 mt-0.5">Ukládání změn přímo do GitHub repozitáře jedním kliknutím</p>
+                <h1 class="text-xl font-extrabold text-white">⚙️ PWA Administrace – Manuální GitHub Sync</h1>
+                <p class="text-xs text-gray-400 mt-0.5">Po každé změně se automaticky stáhne soubor data.json</p>
             </div>
             <a href="index.html" class="bg-brandBlue text-white px-4 py-2 rounded-xl text-xs font-semibold shadow hover:opacity-90">🌐 Zobrazit web</a>
         </div>
 
         <div class="space-y-6">
-            <!-- GITHUB NASTAVENÍ -->
-            <div class="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 p-5 rounded-3xl border border-blue-500/30">
-                <h2 class="text-base font-bold mb-1 text-white">🔑 Nastavení připojení k GitHubu</h2>
-                <p class="text-xs text-gray-300 mb-3">Vyplň své údaje (uloží se bezpečně do paměti tvého prohlížeče):</p>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                    <input type="text" id="gh-owner" placeholder="GitHub jméno (owner)" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
-                    <input type="text" id="gh-repo" placeholder="Název repozitáře" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
-                    <input type="password" id="gh-token" placeholder="GitHub Personal Token" class="p-2.5 rounded-xl bg-gray-900 border border-gray-700 text-xs text-white">
+            <!-- INFO BOX & MANUÁLNÍ STAŽENÍ -->
+            <div class="bg-gradient-to-r from-blue-900/40 to-green-900/40 p-5 rounded-3xl border border-blue-500/30">
+                <h2 class="text-base font-bold mb-1 text-white">📦 Jak to funguje</h2>
+                <p class="text-xs text-gray-300 mb-3">Jakmile cokoliv níže uložíš, upravíš nebo smažeš, prohlížeč ti **automaticky stáhne soubor `data.json`**. Ten stačí nahrát na GitHub do stejné složky jako `index.html`.</p>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="exportAndDownloadData('Záloha data.json byla stažena.')" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow">📥 Stáhnout data.json ručně</button>
+                    <label class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow cursor-pointer">
+                        <span>📤 Obnovit ze zálohy (.json)</span>
+                        <input type="file" accept=".json" onchange="restoreBackup(event)" class="hidden">
+                    </label>
                 </div>
-                <button onclick="saveGitHubSettings()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow">💾 Uložit nastavení připojení</button>
             </div>
 
             <!-- STATISTIKY -->
@@ -180,34 +181,13 @@
             document.getElementById('stat-links').innerText = externalLinks.length;
             if(adCode) document.getElementById('admin-ad-code').value = adCode;
 
-            // Načtení uložených GitHub údajů do inputů
-            if(localStorage.getItem('gh_owner')) document.getElementById('gh-owner').value = localStorage.getItem('gh_owner');
-            if(localStorage.getItem('gh_repo')) document.getElementById('gh-repo').value = localStorage.getItem('gh_repo');
-            if(localStorage.getItem('gh_token')) document.getElementById('gh-token').value = localStorage.getItem('gh_token');
-
             renderAdminProfiles();
             renderAdminArticles();
             renderAdminLinks();
         });
 
-        function saveGitHubSettings() {
-            localStorage.setItem('gh_owner', document.getElementById('gh-owner').value.trim());
-            localStorage.setItem('gh_repo', document.getElementById('gh-repo').value.trim());
-            localStorage.setItem('gh_token', document.getElementById('gh-token').value.trim());
-            alert('GitHub nastavení bylo uloženo!');
-        }
-
-        // AUTOMATICKÉ ODESLÁNÍ DATA.JSON PŘES GITHUB API
-        async function commitAndPushData(successMessage) {
-            const owner = localStorage.getItem('gh_owner');
-            const repo = localStorage.getItem('gh_repo');
-            const token = localStorage.getItem('gh_token');
-
-            if (!owner || !repo || !token) {
-                alert('Před uložením prosím nahoře vyplň a ulož své GitHub údaje (Owner, Repozitář a Token)!');
-                return;
-            }
-
+        // HLAVNÍ FUNKCE: Uloží lokálně a okamžitě stáhne hotový data.json pro GitHub
+        function exportAndDownloadData(successMessage) {
             const backupData = {
                 profiles,
                 articles,
@@ -218,60 +198,54 @@
                 bannerMobil: localStorage.getItem('ch_banner_mobil') || ''
             };
 
-            // Lokální uložení
+            // Uložení do localStorage
             localStorage.setItem('ch_profiles', JSON.stringify(profiles));
             localStorage.setItem('ch_articles', JSON.stringify(articles));
             localStorage.setItem('ch_links', JSON.stringify(externalLinks));
             localStorage.setItem('ch_adcode', adCode);
 
-            const path = 'data.json';
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-            const jsonString = JSON.stringify(backupData, null, 2);
-            const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
+            // Vygenerování a stažení souboru data.json
+            const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
 
-            try {
-                // 1. Zjistit SHA existujícího souboru
-                let sha = null;
-                const getRes = await fetch(url, {
-                    headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json' }
-                });
-                if (getRes.ok) {
-                    const fileData = await getRes.json();
-                    sha = fileData.sha;
-                }
+            alert(successMessage + '\n\nSoubor data.json byl stažen do zařízení. Nahraj ho teď na GitHub!');
+            location.reload();
+        }
 
-                // 2. Odeslat nový soubor na GitHub
-                const putRes = await fetch(url, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: 'Update data.json via PWA Admin',
-                        content: contentBase64,
-                        sha: sha
-                    })
-                });
-
-                if (putRes.ok) {
-                    alert(successMessage + '\n\nZměny byly úspěšně odeslány přímo na GitHub!');
+        function restoreBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.profiles) localStorage.setItem('ch_profiles', JSON.stringify(data.profiles));
+                    if (data.articles) localStorage.setItem('ch_articles', JSON.stringify(data.articles));
+                    if (data.externalLinks) localStorage.setItem('ch_links', JSON.stringify(data.externalLinks));
+                    if (data.adCode) localStorage.setItem('ch_adcode', data.adCode);
+                    if (data.guestbook) localStorage.setItem('ch_guestbook', JSON.stringify(data.guestbook));
+                    if (data.bannerPc) localStorage.setItem('ch_banner_pc', data.bannerPc);
+                    if (data.bannerMobil) localStorage.setItem('ch_banner_mobil', data.bannerMobil);
+                    alert('Záloha byla úspěšně obnovena!');
                     location.reload();
-                } else {
-                    const errData = await putRes.json();
-                    alert('Chyba při odesílání na GitHub: ' + (errData.message || 'Neznámá chyba'));
+                } catch(err) {
+                    alert('Chyba při čtení záložního souboru!');
                 }
-            } catch (err) {
-                alert('Chyba sítě při komunikaci s GitHub API.');
-                console.error(err);
-            }
+            };
+            reader.readAsText(file);
         }
 
         function saveAdCode() {
             adCode = document.getElementById('admin-ad-code').value;
             localStorage.setItem('ch_adcode', adCode);
-            commitAndPushData('Reklama byla uložena.');
+            exportAndDownloadData('Reklama uložena.');
         }
 
         function saveSiteBanner(type) {
@@ -283,7 +257,7 @@
             }
             resizeImage(fileInput.files[0], 1200, 600, function(compressedImg) {
                 localStorage.setItem(type === 'pc' ? 'ch_banner_pc' : 'ch_banner_mobil', compressedImg);
-                commitAndPushData('Banner byl aktualizován.');
+                exportAndDownloadData('Banner aktualizován.');
             });
         }
 
@@ -327,7 +301,7 @@
                 } else {
                     externalLinks.push({ id: Date.now(), title, url, description: desc, banner: bannerUrl || '' });
                 }
-                commitAndPushData('Odkaz byl uložen.');
+                exportAndDownloadData('Odkaz uložen.');
             };
 
             if (fileInput.files && fileInput.files[0]) {
@@ -377,7 +351,7 @@
         function deleteLink(id) {
             if(confirm('Smazat?')) {
                 externalLinks = externalLinks.filter(l => l.id !== id);
-                commitAndPushData('Odkaz byl smazán.');
+                exportAndDownloadData('Odkaz smazán.');
             }
         }
 
@@ -410,7 +384,7 @@
             } else {
                 articles.unshift({ id: Date.now(), title, date: new Date().toLocaleDateString('cs-CZ'), content });
             }
-            commitAndPushData('Článek byl uložen.');
+            exportAndDownloadData('Článek uložen.');
         }
 
         function editArticle(id) {
@@ -449,7 +423,7 @@
         function deleteArticle(id) {
             if(confirm('Smazat?')) {
                 articles = articles.filter(a => a.id !== id);
-                commitAndPushData('Článek byl smazán.');
+                exportAndDownloadData('Článek smazán.');
             }
         }
 
@@ -480,7 +454,7 @@
                         profileImage: coverImg || '', gallery: newGallery, createdAt: Date.now()
                     });
                 }
-                commitAndPushData('Profil byl uložen.');
+                exportAndDownloadData('Profil uložen.');
             };
 
             const processGalleryAndSave = (cover) => {
@@ -536,7 +510,6 @@
         function renderAdminProfiles() {
             const list = document.getElementById('admin-profiles-list');
             if(!profiles.length) { list.innerHTML = '<p class="text-xs text-gray-500">Žádné profily.</p>'; return; }
-            list.setItem = [];
             list.innerHTML = profiles.map(p => {
                 const cover = p.profileImage || (p.gallery && p.gallery[0] ? p.gallery[0] : '');
                 return `
@@ -557,7 +530,7 @@
         function deleteProfile(id) {
             if(confirm('Smazat?')) {
                 profiles = profiles.filter(p => p.id !== id);
-                commitAndPushData('Profil byl smazán.');
+                exportAndDownloadData('Profil smazán.');
             }
         }
     </script>
