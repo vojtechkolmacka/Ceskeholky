@@ -59,13 +59,13 @@
     </header>
 
     <!-- BANNERY -->
-    <div class="hidden md:block w-full bg-navyDark shadow-lg overflow-hidden">
+    <div id="banner-pc-container" class="hidden md:block w-full bg-navyDark shadow-lg overflow-hidden">
         <div class="max-w-7xl mx-auto flex justify-center">
-            <img src="banner-pc.jpg" alt="Desktop Banner" class="banner-pc">
+            <img id="img-banner-pc" src="banner-pc.jpg" alt="Desktop Banner" class="banner-pc">
         </div>
     </div>
-    <div class="block md:hidden w-full bg-navyDark shadow-md overflow-hidden">
-        <img src="banner-mobil.jpg" alt="Mobil Banner" class="banner-mobil">
+    <div id="banner-mobil-container" class="block md:hidden w-full bg-navyDark shadow-md overflow-hidden">
+        <img id="img-banner-mobil" src="banner-mobil.jpg" alt="Mobil Banner" class="banner-mobil">
     </div>
 
     <!-- HLAVNÍ OBSAH -->
@@ -179,25 +179,44 @@
     </footer>
 
     <script>
-        let profiles = JSON.parse(localStorage.getItem('ch_profiles')) || [
-            { id: 1, name: "ZAMBLI", age: 27, location: "Praha", createdAt: Date.now(), profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", gallery: ["https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80"], hair: "brunette", bio: "Populární česká herečka a modelka s množstvím ocenění." }
-        ];
-        let articles = JSON.parse(localStorage.getItem('ch_articles')) || [
-            { id: 1, title: "Historie a vývoj české adult produkce", date: "1. 11. 2026", content: "Jak se české herečky prosadily na světové scéně." }
-        ];
-        let externalLinks = JSON.parse(localStorage.getItem('ch_links')) || [
-            { id: 1, title: "Partnerský web", url: "https://example.com", banner: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80", description: "Navštivte naše partnerské stránky." }
-        ];
-        let guestbook = JSON.parse(localStorage.getItem('ch_guestbook')) || [
-            { name: "Petr", message: "Skvělý portál!", date: "7. 11. 2026" }
-        ];
+        let profiles = [];
+        let articles = [];
+        let externalLinks = [];
+        let guestbook = [];
         let favorites = JSON.parse(localStorage.getItem('ch_favorites')) || [];
-        let adCode = localStorage.getItem('ch_adcode') || '';
         let siteViews = parseInt(localStorage.getItem('ch_site_views') || '0') + 1;
         localStorage.setItem('ch_site_views', siteViews);
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('site-visitor-counter').innerText = siteViews.toLocaleString();
+
+            // Načtení dat ze souboru data.json z GitHubu
+            try {
+                const res = await fetch('data.json?t=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    profiles = data.profiles || [];
+                    articles = data.articles || [];
+                    externalLinks = data.externalLinks || [];
+                    guestbook = data.guestbook || [];
+
+                    // Nastavení reklamního kódu, pokud existuje
+                    if (data.adCode) {
+                        document.getElementById('ad-banner-slot').innerHTML = data.adCode;
+                    }
+
+                    // Nastavení vlastních bannerů, pokud existují
+                    if (data.bannerPc) {
+                        document.getElementById('img-banner-pc').src = data.bannerPc;
+                    }
+                    if (data.bannerMobil) {
+                        document.getElementById('img-banner-mobil').src = data.bannerMobil;
+                    }
+                }
+            } catch (err) {
+                console.error("Nepodařilo se načíst data.json:", err);
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const profileId = urlParams.get('profile');
             if (profileId) openDetail(parseInt(profileId));
@@ -206,7 +225,6 @@
             renderArticles();
             renderLinks();
             renderGuestbook();
-            if(adCode) document.getElementById('ad-banner-slot').innerHTML = adCode;
         });
 
         function switchTab(tabId) {
@@ -363,6 +381,10 @@
         function closeModal() { document.getElementById('profile-modal').classList.add('hidden'); }
 
         function renderArticles() {
+            if(!articles.length) {
+                document.getElementById('articles-grid').innerHTML = '<p class="text-xs text-gray-500 col-span-full text-center">Zatím žádné články.</p>';
+                return;
+            }
             document.getElementById('articles-grid').innerHTML = articles.map(a => `
                 <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
                     <span class="text-[10px] font-semibold text-brandCyan bg-navyDark px-2 py-0.5 rounded-full">${a.date}</span>
@@ -391,7 +413,12 @@
         }
 
         function renderGuestbook() {
-            document.getElementById('guestbook-list').innerHTML = guestbook.map(g => `
+            const list = document.getElementById('guestbook-list');
+            if(!guestbook.length) {
+                list.innerHTML = '<p class="text-xs text-gray-500 text-center py-2">Zatím žádné vzkazy.</p>';
+                return;
+            }
+            list.innerHTML = guestbook.map(g => `
                 <div class="bg-gray-50 p-3 rounded-2xl border text-xs">
                     <div class="flex justify-between font-bold mb-1"><span>${g.name}</span><span class="text-[10px] text-gray-400">${g.date}</span></div>
                     <p class="text-gray-600">${g.message}</p>
@@ -406,10 +433,9 @@
                 message: document.getElementById('gb-message').value,
                 date: new Date().toLocaleDateString('cs-CZ')
             });
-            localStorage.setItem('ch_guestbook', JSON.stringify(guestbook));
             document.getElementById('guestbook-form').reset();
             renderGuestbook();
-            alert('Vzkaz byl odeslán!');
+            alert('Vzkaz byl přidán! Nezapomeň si v administraci stáhnout nový data.json a nahrát ho na GitHub.');
         }
     </script>
     <script src="https://www.stats4u.net/s4u.js" data-id="8921010876" data-style="3304" async></script>
